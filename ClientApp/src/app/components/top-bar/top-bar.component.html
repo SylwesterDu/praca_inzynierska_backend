@@ -1,0 +1,49 @@
+<div [ngClass]="['main', isSearching ? 'main_expanded' : 'main_normal' ]"  #mainPanel>
+    
+    <div class="topbar">
+
+        <div [ngClass]="['logo_container', isSearching ? 'logo_container_hide' : '' ]">
+            <div class="logo_img" *ngIf="!isSearching">aacacsssaa</div>
+        </div>
+
+
+        <div class="search">
+            <input (click)="expand()" type="text" placeholder="Wyszukaj...">
+        </div>
+        <div class="buttons">
+            <app-button text="Załóż konto" variant="secondary" size="normal"></app-button>
+            <app-button text="Zaloguj się" variant="primary" size="normal"></app-button>
+        </div>
+    </div>
+
+    <div *ngIf="isSearching" class="search_hints_container">
+        <div class="tags">
+            <p class="tag_info">
+                Popularne w muzyce:
+            </p>
+            <div *ngFor="let tag of popularMusicTags" class="tag">#{{tag}}</div>
+        </div>
+
+        <div class="tags">
+            <p class="tag_info">
+                Popularne w literaturze:
+            </p>
+            <div *ngFor="let tag of popularLiteratureTags" class="tag">#{{tag}}</div>
+        </div>
+
+        <div class="tags">
+            <p class="tag_info">
+                Popularne w zdjęciach:
+            </p>
+            <div *ngFor="let tag of popularImagesTags" class="tag">#{{tag}}</div>
+        </div>
+
+        <div class="tags">
+            <p class="tag_info">
+                Inne:
+            </p>
+            <div *ngFor="let tag of popularOtherTags" class="tag">#{{tag}}</div>
+        </div>
+        <div></div>
+    </div>
+</div>

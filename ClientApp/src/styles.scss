@@ -1,0 +1,22 @@
+:root {
+  --background-light: #ffffff;
+  --background-dark: rgb(41, 41, 46);
+  --text-primary-dark: #14140f;
+  --text-secondary-dark: #2d3141;
+  --text-primary-light: #eceaea;
+  --text-secondary-light: #b9b9b9;
+  --theme-color1: #34675c;
+  --theme-color1-accent: #053d38;
+  --theme-color2: #f26800;
+  --theme-color2-accent: #d95e01;
+  --theme-color3: white;
+  --theme-color3-accent: #ffecde;
+
+  --delay: 250ms;
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+}
