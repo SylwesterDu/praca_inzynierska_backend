@@ -2,15 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using backend.Data.DTOs;
-using backend.Data.Entities;
-using backend.Services.AccountService;
-using backend.Services.UploadService;
+using praca_inzynierska_backend.Data.DTOs;
+using praca_inzynierska_backend.Services.AccountService;
+using praca_inzynierska_backend.Services.UploadService;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Primitives;
 
-namespace backend.Controllers
+namespace praca_inzynierska_backend.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
@@ -23,23 +22,39 @@ namespace backend.Controllers
             _uploadService = service;
         }
 
+
         [Authorize]
-        [HttpPost("upload-song")]
-        public async Task<IActionResult> UploadSong(UploadSongRequestDTO uploadSongRequestDTO)
+        [HttpGet]
+        public async Task<IActionResult> Begin()
         {
             HttpContext.Request.Headers.TryGetValue("Authorization", out StringValues values);
             string token = values[0].Split(' ')[1];
-            bool success = await _uploadService.UploadSong(token, uploadSongRequestDTO);
+            UploadProcessDTO processDTO = await _uploadService.CreateUploadProcess(token);
 
-            if (success)
-            {
-                return Ok();
+            return Ok(processDTO);
+        }
 
-            }
-            else
-            {
-                return Conflict("Song with given title already exists!");
-            }
+        [Authorize]
+        [HttpPost("{id}")]
+        public async Task<IActionResult> UploadFile(IFormFile formFile, [FromRoute] Guid id)
+        {
+            HttpContext.Request.Headers.TryGetValue("Authorization", out StringValues values);
+            string token = values[0].Split(' ')[1];
+
+            bool result = await _uploadService.UploadFile(token, formFile, id);
+
+            return Ok();
+        }
+
+        [Authorize]
+        [HttpPost("{id}/publish")]
+        public async Task<IActionResult> Publish([FromRoute] Guid id, [FromBody] PublishArtworkRequestDTO publishArtworkRequestDTO)
+        {
+            HttpContext.Request.Headers.TryGetValue("Authorization", out StringValues values);
+            string token = values[0].Split(' ')[1];
+            bool success = await _uploadService.PublishArtWork(token, id, publishArtworkRequestDTO);
+
+            return Ok();
         }
     }
 }

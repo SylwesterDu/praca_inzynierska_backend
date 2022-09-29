@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using backend.Data.Entities;
+using praca_inzynierska_praca_inzynierska_backend.Data.Entities;
 
-namespace backend.Repositories.AccountRepository
+namespace praca_inzynierska_backend.Repositories.AccountRepository
 {
     public interface IAccountRepository
     {

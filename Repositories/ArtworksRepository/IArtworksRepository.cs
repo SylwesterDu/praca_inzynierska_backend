@@ -2,14 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using backend.Data.DTOs;
-using backend.Data.Entities;
+using praca_inzynierska_backend.Data.DTOs;
+using praca_inzynierska_praca_inzynierska_backend.Data.Entities;
 
-namespace backend.Repositories.ArtworksRepository
+namespace praca_inzynierska_backend.Repositories.ArtworksRepository
 {
     public interface IArtworksRepository
     {
-        public Task<UserArtworksResponseDTO> GetUserArtworks(Guid id);
+        public Task<List<Artwork>> GetUserArtworks(Guid id);
         Task<Artwork> getArtworkById(Guid id);
         Task<IEnumerable<Comment>> getArtworkComments(Guid id);
         Task addComment(Comment comment);

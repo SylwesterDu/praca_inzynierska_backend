@@ -1,4 +1,4 @@
-namespace backend.Misc
+namespace praca_inzynierska_praca_inzynierska_backend.Misc
 {
     public enum ArtType
     {

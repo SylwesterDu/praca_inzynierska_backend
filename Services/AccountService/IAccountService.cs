@@ -4,13 +4,15 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using backend.Data.Entities;
+using praca_inzynierska_backend.Data.DTOs;
+using praca_inzynierska_praca_inzynierska_backend.Data.Entities;
 
-namespace backend.Services.AccountService
+namespace praca_inzynierska_backend.Services.AccountService
 {
     public interface IAccountService
     {
         public JwtSecurityToken GetToken(List<Claim> claims);
         Task<User> getUserByToken(string token);
+        Task<UserDTO> GetUserInfo(string token);
     }
 }

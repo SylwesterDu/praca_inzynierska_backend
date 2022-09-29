@@ -2,31 +2,105 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using backend.Data.DTOs;
-using backend.Data.Entities;
-using backend.Repositories.FilesRepository;
-using backend.Services.AccountService;
+using praca_inzynierska_backend.Data.DTOs;
+using praca_inzynierska_backend.Data.Entities;
+using praca_inzynierska_backend.Repositories.FilesRepository;
+using praca_inzynierska_backend.Services.AccountService;
+using praca_inzynierska_praca_inzynierska_backend.Data.Entities;
+using praca_inzynierska_praca_inzynierska_backend.Misc;
 
-namespace backend.Services.UploadService
+namespace praca_inzynierska_backend.Services.UploadService
 {
     public class UploadService : IUploadService
     {
         private readonly IAccountService _accountService;
         private readonly IFilesRepository _filesRepository;
+        private readonly IConfiguration _configuration;
 
-        public UploadService(IAccountService accountService, IFilesRepository filesRepository)
+        public UploadService(IAccountService accountService, IFilesRepository filesRepository, IConfiguration configuration)
         {
             _accountService = accountService;
             _filesRepository = filesRepository;
+            _configuration = configuration;
         }
 
-
-        public async Task<bool> UploadSong(string token, UploadSongRequestDTO uploadSongRequestDTO)
+        public async Task<UploadProcessDTO> CreateUploadProcess(string token)
         {
             User user = await _accountService.getUserByToken(token);
-            bool success = await _filesRepository.UploadSong(user, uploadSongRequestDTO);
-
-            return success;
+            UploadProcess process = new()
+            {
+                Id = new Guid(),
+                CreatedAt = DateTime.Now,
+                Uploader = user
+            };
+            await _filesRepository.addUploadProcess(process);
+            return new UploadProcessDTO()
+            {
+                CreatedAt = process.CreatedAt,
+                Id = process.Id,
+                Uploader = process.Uploader.Id
+            };
         }
+
+
+
+        public async Task<bool> UploadFile(string token, IFormFile formFile, Guid id)
+        {
+            User user = await _accountService.getUserByToken(token);
+            UploadProcess process = await _filesRepository.getUploadProcessById(id);
+            if (process.Uploader != user)
+            {
+                return false;
+            }
+
+            FileData fileData = new()
+            {
+                UploadProcess = process,
+                FileName = Path.GetRandomFileName(),
+                Id = new Guid(),
+                Path = _configuration["FilesPath"],
+
+            };
+
+            if (!Directory.Exists(_configuration["FilesPath"]))
+            {
+                Directory.CreateDirectory(_configuration["FilesPath"]);
+            }
+
+            using (var stream = System.IO.File.Create(fileData.Path + "/" + fileData.FileName))
+            {
+                await formFile.CopyToAsync(stream);
+            }
+
+
+            await _filesRepository.addFile(fileData);
+            return true;
+        }
+
+        public async Task<bool> PublishArtWork(string token, Guid id, PublishArtworkRequestDTO publishArtworkRequestDTO)
+        {
+            User user = await _accountService.getUserByToken(token);
+            UploadProcess process = await _filesRepository.getUploadProcessById(id);
+            Artwork artwork = new Artwork()
+            {
+                ArtType = publishArtworkRequestDTO.ArtType,
+                Title = publishArtworkRequestDTO.Title,
+                Tags = publishArtworkRequestDTO.Tags!.Select(tag => new Tag(tag)).ToList(),
+                Genres = publishArtworkRequestDTO.Genres!.Select(genre => new Genre(genre)).ToList(),
+                Id = process.Id,
+                FilesData = process.FilesData,
+                Views = 0,
+                UpVotes = 0,
+                DownVotes = 0,
+                Owner = user,
+                Comments = new List<Comment>(),
+                Published = true
+            };
+
+            await _filesRepository.AddArtwork(artwork);
+            await _filesRepository.setArtworkIdToFiles(process, artwork.Id);
+            return true;
+        }
+
     }
 }

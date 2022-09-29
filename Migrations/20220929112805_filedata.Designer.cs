@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using praca_inzynierska_backend.Data;
 
@@ -11,9 +12,10 @@ using praca_inzynierska_backend.Data;
 namespace praca_inzynierska_backend.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220929112805_filedata")]
+    partial class filedata
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -140,14 +142,9 @@ namespace praca_inzynierska_backend.Migrations
                     b.Property<string>("Path")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid?>("UploadProcessId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.HasKey("Id");
 
                     b.HasIndex("ArtworkId");
-
-                    b.HasIndex("UploadProcessId");
 
                     b.ToTable("FilesData");
                 });
@@ -414,15 +411,11 @@ namespace praca_inzynierska_backend.Migrations
 
             modelBuilder.Entity("praca_inzynierska_backend.Data.Entities.FileData", b =>
                 {
-                    b.HasOne("praca_inzynierska_praca_inzynierska_backend.Data.Entities.Artwork", null)
+                    b.HasOne("praca_inzynierska_praca_inzynierska_backend.Data.Entities.Artwork", "Artwork")
                         .WithMany("FilesData")
                         .HasForeignKey("ArtworkId");
 
-                    b.HasOne("praca_inzynierska_praca_inzynierska_backend.Data.Entities.UploadProcess", "UploadProcess")
-                        .WithMany("FilesData")
-                        .HasForeignKey("UploadProcessId");
-
-                    b.Navigation("UploadProcess");
+                    b.Navigation("Artwork");
                 });
 
             modelBuilder.Entity("praca_inzynierska_praca_inzynierska_backend.Data.Entities.Artwork", b =>
@@ -481,11 +474,6 @@ namespace praca_inzynierska_backend.Migrations
                     b.Navigation("Genres");
 
                     b.Navigation("Tags");
-                });
-
-            modelBuilder.Entity("praca_inzynierska_praca_inzynierska_backend.Data.Entities.UploadProcess", b =>
-                {
-                    b.Navigation("FilesData");
                 });
 
             modelBuilder.Entity("praca_inzynierska_praca_inzynierska_backend.Data.Entities.User", b =>

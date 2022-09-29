@@ -5,20 +5,19 @@ using System.Threading.Tasks;
 
 namespace praca_inzynierska_praca_inzynierska_backend.Misc
 {
-    public class Tag
+    public record Genre
     {
-
-        public Tag(string name)
+        public Genre(string name)
         {
-            TagName = name;
             Id = new Guid();
+            GenreName = name;
         }
 
-        public Tag()
+        public Genre()
         {
 
         }
         public Guid Id { get; set; }
-        public string? TagName { get; set; }
+        public string? GenreName { get; set; }
     }
 }

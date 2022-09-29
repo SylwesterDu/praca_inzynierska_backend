@@ -2,13 +2,16 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using backend.Data.DTOs;
-using backend.Data.Entities;
-using backend.Services.ArtworksService;
+using praca_inzynierska_backend.Data.DTOs;
+using praca_inzynierska_backend.Services.AccountService;
+using praca_inzynierska_backend.Services.ArtworksService;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Primitives;
+using praca_inzynierska_praca_inzynierska_backend.Data.Entities;
 
-namespace backend.Controllers
+namespace praca_inzynierska_backend.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
@@ -16,11 +19,13 @@ namespace backend.Controllers
     {
         private IArtworksService _artworksService;
         private UserManager<User> _userManager;
+        private IAccountService _accountService;
 
-        public UserController(IArtworksService artworksService, UserManager<User> userManager)
+        public UserController(IArtworksService artworksService, UserManager<User> userManager, IAccountService accountService)
         {
             _artworksService = artworksService;
             _userManager = userManager;
+            _accountService = accountService;
         }
 
         [HttpGet("{id}/artworks")]
@@ -34,5 +39,18 @@ namespace backend.Controllers
             UserArtworksResponseDTO dto = await _artworksService.GetUserArtworks(id);
             return Ok(dto);
         }
+
+        [Authorize]
+        [HttpGet()]
+        public async Task<ActionResult<UserDTO>> GetUserInfo()
+        {
+            HttpContext.Request.Headers.TryGetValue("Authorization", out StringValues values);
+            string token = values[0].Split(' ')[1];
+
+            UserDTO userDTO = await _accountService.GetUserInfo(token);
+
+            return Ok(userDTO);
+        }
+
     }
 }

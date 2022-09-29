@@ -2,12 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using backend.Data.Entities;
-using backend.Misc;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using praca_inzynierska_backend.Data.Entities;
+using praca_inzynierska_praca_inzynierska_backend.Data.Entities;
+using praca_inzynierska_praca_inzynierska_backend.Misc;
 
-namespace backend.Data
+namespace praca_inzynierska_backend.Data
 {
     public class AppDbContext : IdentityDbContext<User, Role, Guid>
     {
@@ -18,6 +19,9 @@ namespace backend.Data
         public DbSet<Artwork>? Artworks { get; set; }
         public DbSet<Comment>? Comments { get; set; }
         public DbSet<Tag>? Tags { get; set; }
+        public DbSet<Genre>? Genres { get; set; }
+        public DbSet<UploadProcess>? UploadProcesses { get; set; }
+        public DbSet<FileData>? FilesData { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -30,6 +34,10 @@ namespace backend.Data
 
             builder.Entity<Artwork>()
                 .HasMany<Tag>(artwork => artwork.Tags);
+
+            builder.Entity<UploadProcess>()
+                .HasMany<FileData>(uploadProcess => uploadProcess.FilesData)
+                .WithOne(fileData => fileData.UploadProcess);
 
             base.OnModelCreating(builder);
         }

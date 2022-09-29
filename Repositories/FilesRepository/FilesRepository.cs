@@ -2,13 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using backend.Data;
-using backend.Data.DTOs;
-using backend.Data.Entities;
-using backend.Misc;
+using praca_inzynierska_backend.Data;
+using praca_inzynierska_backend.Data.DTOs;
 using Microsoft.EntityFrameworkCore;
+using praca_inzynierska_praca_inzynierska_backend.Data.Entities;
+using praca_inzynierska_praca_inzynierska_backend.Misc;
+using praca_inzynierska_backend.Data.Entities;
 
-namespace backend.Repositories.FilesRepository
+namespace praca_inzynierska_backend.Repositories.FilesRepository
 {
     public class FilesRepository : IFilesRepository
     {
@@ -19,37 +20,41 @@ namespace backend.Repositories.FilesRepository
             _context = context;
         }
 
-        public async Task<bool> UploadSong(User uploader, UploadSongRequestDTO uploadSongRequestDTO)
+        public async Task AddArtwork(Artwork artwork)
         {
-            Artwork? artWork = await _context!.Artworks!
-                .FirstOrDefaultAsync(artWork => artWork.Title == uploadSongRequestDTO.Title);
+            await _context.Artworks!.AddAsync(artwork);
+            await _context.SaveChangesAsync();
+        }
 
-            if (artWork is not null)
+        public async Task addFile(FileData fileData)
+        {
+            await _context!.FilesData!.AddAsync(fileData);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task addUploadProcess(UploadProcess process)
+        {
+            await _context.UploadProcesses!.AddAsync(process);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<UploadProcess> getUploadProcessById(Guid id)
+        {
+            UploadProcess? process = await _context!
+                .UploadProcesses!
+                .Include(process => process.FilesData)
+                .FirstOrDefaultAsync(process => process.Id == id);
+            return process!;
+        }
+
+        public async Task setArtworkIdToFiles(UploadProcess process, Guid id)
+        {
+            foreach (FileData fileData in process.FilesData!)
             {
-                return false;
+                fileData.ArtworkId = id;
             }
-
-
-            User? user = await _context.Users!.FirstOrDefaultAsync(user => user.Id == uploader.Id);
-            if (user is null)
-            {
-                return false;
-            }
-
-
-            user.Artworks!.Add(new Artwork()
-            {
-                ArtType = ArtType.MUSIC,
-                Owner = user,
-                Id = new Guid(),
-                Tags = uploadSongRequestDTO!.Tags!.Select(tag => new Tag(tag)).ToList(),
-                Title = uploadSongRequestDTO.Title,
-                Views = 0,
-            });
 
             await _context.SaveChangesAsync();
-
-            return true;
         }
     }
 }

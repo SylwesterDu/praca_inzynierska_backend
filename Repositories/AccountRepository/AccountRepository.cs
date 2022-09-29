@@ -4,12 +4,11 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using backend.Data;
-using backend.Data.Entities;
+using praca_inzynierska_backend.Data;
 using Microsoft.EntityFrameworkCore;
+using praca_inzynierska_praca_inzynierska_backend.Data.Entities;
 
-
-namespace backend.Repositories.AccountRepository
+namespace praca_inzynierska_backend.Repositories.AccountRepository
 {
     public class AccountRepository : IAccountRepository
     {

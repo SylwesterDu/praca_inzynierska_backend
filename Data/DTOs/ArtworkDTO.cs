@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using backend.Misc;
+using praca_inzynierska_praca_inzynierska_backend.Misc;
 
-namespace backend.Data.DTOs
+namespace praca_inzynierska_backend.Data.DTOs
 {
     public record ArtworkDTO
     {
@@ -15,7 +15,8 @@ namespace backend.Data.DTOs
         public int UpVotes { get; set; }
         public int DownVotes { get; set; }
         public long Views { get; set; }
-        public ArtType ArtType;
-        public IEnumerable<string>? Tags { get; set; }
+        public ArtType ArtType { get; set; }
+        public List<Genre>? Genres { get; set; }
+        public List<string>? Tags { get; set; }
     }
 }

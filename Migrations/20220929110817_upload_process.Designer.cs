@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using praca_inzynierska_backend.Data;
 
@@ -11,9 +12,10 @@ using praca_inzynierska_backend.Data;
 namespace praca_inzynierska_backend.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220929110817_upload_process")]
+    partial class upload_process
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -125,33 +127,6 @@ namespace praca_inzynierska_backend.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("praca_inzynierska_backend.Data.Entities.FileData", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("ArtworkId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("FileName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Path")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid?>("UploadProcessId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ArtworkId");
-
-                    b.HasIndex("UploadProcessId");
-
-                    b.ToTable("FilesData");
-                });
-
             modelBuilder.Entity("praca_inzynierska_praca_inzynierska_backend.Data.Entities.Artwork", b =>
                 {
                     b.Property<Guid>("Id")
@@ -172,9 +147,6 @@ namespace praca_inzynierska_backend.Migrations
 
                     b.Property<long>("Views")
                         .HasColumnType("bigint");
-
-                    b.Property<bool>("published")
-                        .HasColumnType("bit");
 
                     b.HasKey("Id");
 
@@ -412,19 +384,6 @@ namespace praca_inzynierska_backend.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("praca_inzynierska_backend.Data.Entities.FileData", b =>
-                {
-                    b.HasOne("praca_inzynierska_praca_inzynierska_backend.Data.Entities.Artwork", null)
-                        .WithMany("FilesData")
-                        .HasForeignKey("ArtworkId");
-
-                    b.HasOne("praca_inzynierska_praca_inzynierska_backend.Data.Entities.UploadProcess", "UploadProcess")
-                        .WithMany("FilesData")
-                        .HasForeignKey("UploadProcessId");
-
-                    b.Navigation("UploadProcess");
-                });
-
             modelBuilder.Entity("praca_inzynierska_praca_inzynierska_backend.Data.Entities.Artwork", b =>
                 {
                     b.HasOne("praca_inzynierska_praca_inzynierska_backend.Data.Entities.User", "Owner")
@@ -476,16 +435,9 @@ namespace praca_inzynierska_backend.Migrations
                 {
                     b.Navigation("Comments");
 
-                    b.Navigation("FilesData");
-
                     b.Navigation("Genres");
 
                     b.Navigation("Tags");
-                });
-
-            modelBuilder.Entity("praca_inzynierska_praca_inzynierska_backend.Data.Entities.UploadProcess", b =>
-                {
-                    b.Navigation("FilesData");
                 });
 
             modelBuilder.Entity("praca_inzynierska_praca_inzynierska_backend.Data.Entities.User", b =>

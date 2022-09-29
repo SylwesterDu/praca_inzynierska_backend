@@ -12,8 +12,8 @@ using praca_inzynierska_backend.Data;
 namespace praca_inzynierska_backend.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20220913121245_initial")]
-    partial class initial
+    [Migration("20220929095418_genres")]
+    partial class genres
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -24,7 +24,7 @@ namespace praca_inzynierska_backend.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
 
-            modelBuilder.Entity("praca_inzynierska_backend.Data.Entities.ArtWork", b =>
+            modelBuilder.Entity("praca_inzynierska_backend.Data.Entities.Artwork", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -36,6 +36,9 @@ namespace praca_inzynierska_backend.Migrations
                     b.Property<Guid?>("OwnerId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("Title")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("UpVotes")
                         .HasColumnType("int");
 
@@ -46,7 +49,7 @@ namespace praca_inzynierska_backend.Migrations
 
                     b.HasIndex("OwnerId");
 
-                    b.ToTable("ArtWorks");
+                    b.ToTable("Artworks");
                 });
 
             modelBuilder.Entity("praca_inzynierska_backend.Data.Entities.Comment", b =>
@@ -55,7 +58,7 @@ namespace praca_inzynierska_backend.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("ArtWorkId")
+                    b.Property<Guid?>("ArtworkId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Content")
@@ -64,9 +67,14 @@ namespace praca_inzynierska_backend.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<Guid?>("CreatorId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("ArtWorkId");
+                    b.HasIndex("ArtworkId");
+
+                    b.HasIndex("CreatorId");
 
                     b.ToTable("Comments");
                 });
@@ -268,10 +276,48 @@ namespace praca_inzynierska_backend.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("praca_inzynierska_backend.Data.Entities.ArtWork", b =>
+            modelBuilder.Entity("praca_inzynierska_praca_inzynierska_backend.Misc.Genre", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("ArtworkId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("GenreName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ArtworkId");
+
+                    b.ToTable("Genres");
+                });
+
+            modelBuilder.Entity("praca_inzynierska_praca_inzynierska_backend.Misc.Tag", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("ArtworkId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("TagName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ArtworkId");
+
+                    b.ToTable("Tags");
+                });
+
+            modelBuilder.Entity("praca_inzynierska_backend.Data.Entities.Artwork", b =>
                 {
                     b.HasOne("praca_inzynierska_backend.Data.Entities.User", "Owner")
-                        .WithMany("ArtWorks")
+                        .WithMany("Artworks")
                         .HasForeignKey("OwnerId");
 
                     b.Navigation("Owner");
@@ -279,9 +325,17 @@ namespace praca_inzynierska_backend.Migrations
 
             modelBuilder.Entity("praca_inzynierska_backend.Data.Entities.Comment", b =>
                 {
-                    b.HasOne("praca_inzynierska_backend.Data.Entities.ArtWork", null)
+                    b.HasOne("praca_inzynierska_backend.Data.Entities.Artwork", "Artwork")
                         .WithMany("Comments")
-                        .HasForeignKey("ArtWorkId");
+                        .HasForeignKey("ArtworkId");
+
+                    b.HasOne("praca_inzynierska_backend.Data.Entities.User", "Creator")
+                        .WithMany()
+                        .HasForeignKey("CreatorId");
+
+                    b.Navigation("Artwork");
+
+                    b.Navigation("Creator");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
@@ -335,14 +389,32 @@ namespace praca_inzynierska_backend.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("praca_inzynierska_backend.Data.Entities.ArtWork", b =>
+            modelBuilder.Entity("praca_inzynierska_praca_inzynierska_backend.Misc.Genre", b =>
+                {
+                    b.HasOne("praca_inzynierska_backend.Data.Entities.Artwork", null)
+                        .WithMany("Genres")
+                        .HasForeignKey("ArtworkId");
+                });
+
+            modelBuilder.Entity("praca_inzynierska_praca_inzynierska_backend.Misc.Tag", b =>
+                {
+                    b.HasOne("praca_inzynierska_backend.Data.Entities.Artwork", null)
+                        .WithMany("Tags")
+                        .HasForeignKey("ArtworkId");
+                });
+
+            modelBuilder.Entity("praca_inzynierska_backend.Data.Entities.Artwork", b =>
                 {
                     b.Navigation("Comments");
+
+                    b.Navigation("Genres");
+
+                    b.Navigation("Tags");
                 });
 
             modelBuilder.Entity("praca_inzynierska_backend.Data.Entities.User", b =>
                 {
-                    b.Navigation("ArtWorks");
+                    b.Navigation("Artworks");
                 });
 #pragma warning restore 612, 618
         }

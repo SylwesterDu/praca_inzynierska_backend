@@ -5,11 +5,11 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using backend.Data;
+using praca_inzynierska_backend.Data;
 
 #nullable disable
 
-namespace backend.Migrations
+namespace praca_inzynierska_backend.Migrations
 {
     [DbContext(typeof(AppDbContext))]
     [Migration("20220915143233_art_type")]
@@ -24,7 +24,7 @@ namespace backend.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
 
-            modelBuilder.Entity("backend.Data.Entities.ArtWork", b =>
+            modelBuilder.Entity("praca_inzynierska_backend.Data.Entities.ArtWork", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -49,7 +49,7 @@ namespace backend.Migrations
                     b.ToTable("ArtWorks");
                 });
 
-            modelBuilder.Entity("backend.Data.Entities.Comment", b =>
+            modelBuilder.Entity("praca_inzynierska_backend.Data.Entities.Comment", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -76,7 +76,7 @@ namespace backend.Migrations
                     b.ToTable("Comments");
                 });
 
-            modelBuilder.Entity("backend.Data.Entities.Role", b =>
+            modelBuilder.Entity("praca_inzynierska_backend.Data.Entities.Role", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -104,7 +104,7 @@ namespace backend.Migrations
                     b.ToTable("AspNetRoles", (string)null);
                 });
 
-            modelBuilder.Entity("backend.Data.Entities.User", b =>
+            modelBuilder.Entity("praca_inzynierska_backend.Data.Entities.User", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -170,7 +170,7 @@ namespace backend.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
-            modelBuilder.Entity("backend.Misc.Tag", b =>
+            modelBuilder.Entity("praca_inzynierska_backend.Misc.Tag", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -292,38 +292,38 @@ namespace backend.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("backend.Data.Entities.ArtWork", b =>
+            modelBuilder.Entity("praca_inzynierska_backend.Data.Entities.ArtWork", b =>
                 {
-                    b.HasOne("backend.Data.Entities.User", "Owner")
+                    b.HasOne("praca_inzynierska_backend.Data.Entities.User", "Owner")
                         .WithMany("ArtWorks")
                         .HasForeignKey("OwnerId");
 
                     b.Navigation("Owner");
                 });
 
-            modelBuilder.Entity("backend.Data.Entities.Comment", b =>
+            modelBuilder.Entity("praca_inzynierska_backend.Data.Entities.Comment", b =>
                 {
-                    b.HasOne("backend.Data.Entities.ArtWork", null)
+                    b.HasOne("praca_inzynierska_backend.Data.Entities.ArtWork", null)
                         .WithMany("Comments")
                         .HasForeignKey("ArtWorkId");
 
-                    b.HasOne("backend.Data.Entities.User", "Creator")
+                    b.HasOne("praca_inzynierska_backend.Data.Entities.User", "Creator")
                         .WithMany()
                         .HasForeignKey("CreatorId");
 
                     b.Navigation("Creator");
                 });
 
-            modelBuilder.Entity("backend.Misc.Tag", b =>
+            modelBuilder.Entity("praca_inzynierska_backend.Misc.Tag", b =>
                 {
-                    b.HasOne("backend.Data.Entities.ArtWork", null)
+                    b.HasOne("praca_inzynierska_backend.Data.Entities.ArtWork", null)
                         .WithMany("Tags")
                         .HasForeignKey("ArtWorkId");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
                 {
-                    b.HasOne("backend.Data.Entities.Role", null)
+                    b.HasOne("praca_inzynierska_backend.Data.Entities.Role", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -332,7 +332,7 @@ namespace backend.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<System.Guid>", b =>
                 {
-                    b.HasOne("backend.Data.Entities.User", null)
+                    b.HasOne("praca_inzynierska_backend.Data.Entities.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -341,7 +341,7 @@ namespace backend.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<System.Guid>", b =>
                 {
-                    b.HasOne("backend.Data.Entities.User", null)
+                    b.HasOne("praca_inzynierska_backend.Data.Entities.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -350,13 +350,13 @@ namespace backend.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<System.Guid>", b =>
                 {
-                    b.HasOne("backend.Data.Entities.Role", null)
+                    b.HasOne("praca_inzynierska_backend.Data.Entities.Role", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("backend.Data.Entities.User", null)
+                    b.HasOne("praca_inzynierska_backend.Data.Entities.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -365,21 +365,21 @@ namespace backend.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<System.Guid>", b =>
                 {
-                    b.HasOne("backend.Data.Entities.User", null)
+                    b.HasOne("praca_inzynierska_backend.Data.Entities.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("backend.Data.Entities.ArtWork", b =>
+            modelBuilder.Entity("praca_inzynierska_backend.Data.Entities.ArtWork", b =>
                 {
                     b.Navigation("Comments");
 
                     b.Navigation("Tags");
                 });
 
-            modelBuilder.Entity("backend.Data.Entities.User", b =>
+            modelBuilder.Entity("praca_inzynierska_backend.Data.Entities.User", b =>
                 {
                     b.Navigation("ArtWorks");
                 });

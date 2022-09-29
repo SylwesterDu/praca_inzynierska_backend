@@ -2,13 +2,18 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using backend.Data.DTOs;
-using backend.Data.Entities;
+using praca_inzynierska_backend.Data.DTOs;
+using praca_inzynierska_backend.Data.Entities;
+using praca_inzynierska_praca_inzynierska_backend.Data.Entities;
 
-namespace backend.Repositories.FilesRepository
+namespace praca_inzynierska_backend.Repositories.FilesRepository
 {
     public interface IFilesRepository
     {
-        public Task<bool> UploadSong(User user, UploadSongRequestDTO uploadSongRequestDTO);
+        Task addUploadProcess(UploadProcess process);
+        Task<UploadProcess> getUploadProcessById(Guid id);
+        Task addFile(FileData fileData);
+        Task AddArtwork(Artwork artwork);
+        Task setArtworkIdToFiles(UploadProcess process, Guid id);
     }
 }

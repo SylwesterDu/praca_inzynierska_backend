@@ -5,12 +5,12 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
-using backend.Data.DTOs;
-using backend.Data.Entities;
-using backend.Repositories.AccountRepository;
+using praca_inzynierska_backend.Data.DTOs;
+using praca_inzynierska_backend.Repositories.AccountRepository;
 using Microsoft.IdentityModel.Tokens;
+using praca_inzynierska_praca_inzynierska_backend.Data.Entities;
 
-namespace backend.Services.AccountService
+namespace praca_inzynierska_backend.Services.AccountService
 {
     public class AccountService : IAccountService
     {
@@ -43,6 +43,16 @@ namespace backend.Services.AccountService
         {
             User user = await _accountRepository.getUserByToken(token);
             return user;
+        }
+
+        public async Task<UserDTO> GetUserInfo(string token)
+        {
+            User user = await getUserByToken(token);
+            return new UserDTO()
+            {
+                Id = user.Id,
+                Username = user.UserName
+            };
         }
     }
 }

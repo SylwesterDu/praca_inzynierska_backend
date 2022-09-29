@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using backend.Data.DTOs;
+using praca_inzynierska_backend.Data.DTOs;
 
-namespace backend.Services.ArtworksService
+namespace praca_inzynierska_backend.Services.ArtworksService
 {
     public interface IArtworksService
     {

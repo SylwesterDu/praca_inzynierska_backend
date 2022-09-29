@@ -2,7 +2,7 @@
 
 #nullable disable
 
-namespace backend.Migrations
+namespace praca_inzynierska_backend.Migrations
 {
     public partial class art_title : Migration
     {

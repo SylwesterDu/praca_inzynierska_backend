@@ -4,15 +4,15 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using backend.Data.DTOs;
-using backend.Data.Entities;
-using backend.Services.AccountService;
+using praca_inzynierska_backend.Data.DTOs;
+using praca_inzynierska_backend.Services.AccountService;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Primitives;
+using praca_inzynierska_praca_inzynierska_backend.Data.Entities;
 
-namespace backend.Controllers
+namespace praca_inzynierska_backend.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 
-namespace backend.Data.Entities
+namespace praca_inzynierska_praca_inzynierska_backend.Data.Entities
 {
     public class User : IdentityUser<Guid>
     {

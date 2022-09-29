@@ -2,13 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using backend.Data.DTOs;
-using backend.Services.ArtworksService;
+using praca_inzynierska_backend.Data.DTOs;
+using praca_inzynierska_backend.Services.ArtworksService;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Primitives;
 
-namespace backend.Controllers
+namespace praca_inzynierska_backend.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]

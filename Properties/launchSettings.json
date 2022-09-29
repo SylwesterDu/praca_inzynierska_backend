@@ -9,7 +9,7 @@
     }
   },
   "profiles": {
-    "backend": {
+    "praca_inzynierska_backend": {
       "commandName": "Project",
       "dotnetRunMessages": true,
       "launchBrowser": true,

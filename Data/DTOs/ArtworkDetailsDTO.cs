@@ -2,10 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using backend.Data.Entities;
-using backend.Misc;
+using praca_inzynierska_praca_inzynierska_backend.Misc;
 
-namespace backend.Data.DTOs
+namespace praca_inzynierska_backend.Data.DTOs
 {
     public class ArtworkDetailsDTO
     {
@@ -13,11 +12,11 @@ namespace backend.Data.DTOs
         public Guid Id { get; set; }
         public string? Title { get; set; }
         public virtual UserDTO? Owner { get; set; }
-        //public virtual List<Comment>? Comments { get; set; }
         public int UpVotes { get; set; }
         public int DownVotes { get; set; }
         public long Views { get; set; }
-        public ArtType ArtType;
+        public ArtType ArtType { get; set; }
+        public List<string>? Genres { get; set; }
         public IEnumerable<string>? Tags { get; set; }
     }
 }

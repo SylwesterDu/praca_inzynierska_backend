@@ -2,12 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using backend.Data;
-using backend.Data.DTOs;
-using backend.Data.Entities;
+using praca_inzynierska_backend.Data;
+using praca_inzynierska_backend.Data.DTOs;
 using Microsoft.EntityFrameworkCore;
+using praca_inzynierska_praca_inzynierska_backend.Data.Entities;
 
-namespace backend.Repositories.ArtworksRepository
+namespace praca_inzynierska_backend.Repositories.ArtworksRepository
 {
     public class ArtworksRepository : IArtworksRepository
     {
@@ -34,30 +34,32 @@ namespace backend.Repositories.ArtworksRepository
         {
             Artwork? artwork = await _context!.Artworks!.Where(_artwork => _artwork.Id == id)
                 .Include(artwork => artwork.Owner)
-                .Include(artwork => artwork.Tags).FirstOrDefaultAsync();
+                .Include(artwork => artwork.Tags)
+                .Include(artwork => artwork.Genres)
+                .Include(artwork => artwork.FilesData)
+                .FirstOrDefaultAsync();
 
             return artwork!;
         }
 
-        public async Task<UserArtworksResponseDTO> GetUserArtworks(Guid id)
+        public async Task<List<Artwork>> GetUserArtworks(Guid id)
         {
             User? user = await _context.Users!.Where(user => user.Id == id)
                 .Include(user => user.Artworks)!
                 .ThenInclude(artwork => artwork.Tags).FirstOrDefaultAsync();
 
-            return new UserArtworksResponseDTO()
+            if (user is null)
             {
-                Artworks = user!.Artworks!.Select(artwork => new ArtworkDTO()
-                {
-                    Id = artwork.Id,
-                    ArtType = artwork.ArtType,
-                    DownVotes = artwork.DownVotes,
-                    UpVotes = artwork.UpVotes,
-                    Title = artwork.Title,
-                    Tags = artwork!.Tags!.Select(tag => tag.TagName)!,
-                    Views = artwork.Views
-                }).ToList()
-            };
+                return new List<Artwork>();
+            }
+
+            if (user.Artworks is null)
+            {
+                return new List<Artwork>();
+
+            }
+
+            return user.Artworks;
         }
 
         public async Task addComment(Comment comment)

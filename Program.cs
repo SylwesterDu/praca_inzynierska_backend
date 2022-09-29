@@ -1,17 +1,16 @@
 using System.Text;
-using backend.Data;
-using backend.Data.Entities;
-using backend.Repositories.AccountRepository;
-using backend.Repositories.ArtworksRepository;
-using backend.Repositories.FilesRepository;
-using backend.Services.AccountService;
-using backend.Services.ArtworksService;
-using backend.Services.UploadService;
+using praca_inzynierska_backend.Data;
+using praca_inzynierska_backend.Repositories.AccountRepository;
+using praca_inzynierska_backend.Repositories.ArtworksRepository;
+using praca_inzynierska_backend.Repositories.FilesRepository;
+using praca_inzynierska_backend.Services.AccountService;
+using praca_inzynierska_backend.Services.ArtworksService;
+using praca_inzynierska_backend.Services.UploadService;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-
+using praca_inzynierska_praca_inzynierska_backend.Data.Entities;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -68,7 +67,14 @@ builder.Services.AddScoped<IArtworksService, ArtworksService>();
 builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 builder.Services.AddScoped<IFilesRepository, FilesRepository>();
 builder.Services.AddScoped<IArtworksRepository, ArtworksRepository>();
+builder.Services.AddCors(o => o.AddPolicy("CorsPolicy", builder =>
+{
+    builder
+        .AllowAnyOrigin()
+        .AllowAnyHeader();
+}));
 var app = builder.Build();
+app.UseCors("CorsPolicy");
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -76,6 +82,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+
 
 app.UseHttpsRedirection();
 
