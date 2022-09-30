@@ -26,19 +26,19 @@ namespace praca_inzynierska_backend.Repositories.FilesRepository
             await _context.SaveChangesAsync();
         }
 
-        public async Task addFile(FileData fileData)
+        public async Task AddFile(FileData fileData)
         {
             await _context!.FilesData!.AddAsync(fileData);
             await _context.SaveChangesAsync();
         }
 
-        public async Task addUploadProcess(UploadProcess process)
+        public async Task AddUploadProcess(UploadProcess process)
         {
             await _context.UploadProcesses!.AddAsync(process);
             await _context.SaveChangesAsync();
         }
 
-        public async Task<UploadProcess> getUploadProcessById(Guid id)
+        public async Task<UploadProcess> GetUploadProcessById(Guid id)
         {
             UploadProcess? process = await _context!
                 .UploadProcesses!
@@ -47,7 +47,7 @@ namespace praca_inzynierska_backend.Repositories.FilesRepository
             return process!;
         }
 
-        public async Task setArtworkIdToFiles(UploadProcess process, Guid id)
+        public async Task SetArtworkIdToFiles(UploadProcess process, Guid id)
         {
             foreach (FileData fileData in process.FilesData!)
             {

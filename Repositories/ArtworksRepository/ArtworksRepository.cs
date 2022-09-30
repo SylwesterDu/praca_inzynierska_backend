@@ -18,7 +18,7 @@ namespace praca_inzynierska_backend.Repositories.ArtworksRepository
             _context = context;
         }
 
-        public async Task<IEnumerable<Comment>> getArtworkComments(Guid id)
+        public async Task<IEnumerable<Comment>> GetArtworkComments(Guid id)
         {
             Artwork? artwork = await _context.Artworks!.FirstOrDefaultAsync(artwork => artwork.Id == id);
 
@@ -27,10 +27,10 @@ namespace praca_inzynierska_backend.Repositories.ArtworksRepository
                 return null!;
             }
             return await _context.Comments!.Where(comment => comment.Artwork!.Id == id)
-            .Include(comment => comment.Creator).ToListAsync(); //TODO: sprawdz czy pobiera komentarze
+            .Include(comment => comment.Creator).ToListAsync();
         }
 
-        public async Task<Artwork> getArtworkById(Guid id)
+        public async Task<Artwork> GetArtworkById(Guid id)
         {
             Artwork? artwork = await _context!.Artworks!.Where(_artwork => _artwork.Id == id)
                 .Include(artwork => artwork.Owner)
@@ -62,7 +62,7 @@ namespace praca_inzynierska_backend.Repositories.ArtworksRepository
             return user.Artworks;
         }
 
-        public async Task addComment(Comment comment)
+        public async Task AddComment(Comment comment)
         {
             await _context.Comments!.AddAsync(comment);
             await _context.SaveChangesAsync();

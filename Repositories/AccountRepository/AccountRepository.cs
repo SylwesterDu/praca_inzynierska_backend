@@ -19,7 +19,7 @@ namespace praca_inzynierska_backend.Repositories.AccountRepository
             _context = appDbContext;
         }
 
-        public async Task<User> getUserByToken(string token)
+        public async Task<User> GetUserByToken(string token)
         {
             Guid userId = parseJwtToken(token).Id;
 
@@ -27,7 +27,7 @@ namespace praca_inzynierska_backend.Repositories.AccountRepository
             return user!;
         }
 
-        protected ParsedJwtToken parseJwtToken(string token)
+        private ParsedJwtToken parseJwtToken(string token)
         {
             JwtSecurityTokenHandler handler = new JwtSecurityTokenHandler();
             JwtSecurityToken? securityToken = handler.ReadToken(token) as JwtSecurityToken;

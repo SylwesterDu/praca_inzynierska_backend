@@ -10,10 +10,10 @@ namespace praca_inzynierska_backend.Repositories.FilesRepository
 {
     public interface IFilesRepository
     {
-        Task addUploadProcess(UploadProcess process);
-        Task<UploadProcess> getUploadProcessById(Guid id);
-        Task addFile(FileData fileData);
+        Task AddUploadProcess(UploadProcess process);
+        Task<UploadProcess> GetUploadProcessById(Guid id);
+        Task AddFile(FileData fileData);
         Task AddArtwork(Artwork artwork);
-        Task setArtworkIdToFiles(UploadProcess process, Guid id);
+        Task SetArtworkIdToFiles(UploadProcess process, Guid id);
     }
 }

@@ -26,14 +26,14 @@ namespace praca_inzynierska_backend.Services.UploadService
 
         public async Task<UploadProcessDTO> CreateUploadProcess(string token)
         {
-            User user = await _accountService.getUserByToken(token);
+            User user = await _accountService.GetUserByToken(token);
             UploadProcess process = new()
             {
                 Id = new Guid(),
                 CreatedAt = DateTime.Now,
                 Uploader = user
             };
-            await _filesRepository.addUploadProcess(process);
+            await _filesRepository.AddUploadProcess(process);
             return new UploadProcessDTO()
             {
                 CreatedAt = process.CreatedAt,
@@ -46,8 +46,8 @@ namespace praca_inzynierska_backend.Services.UploadService
 
         public async Task<bool> UploadFile(string token, IFormFile formFile, Guid id)
         {
-            User user = await _accountService.getUserByToken(token);
-            UploadProcess process = await _filesRepository.getUploadProcessById(id);
+            User user = await _accountService.GetUserByToken(token);
+            UploadProcess process = await _filesRepository.GetUploadProcessById(id);
             if (process.Uploader != user)
             {
                 return false;
@@ -73,14 +73,21 @@ namespace praca_inzynierska_backend.Services.UploadService
             }
 
 
-            await _filesRepository.addFile(fileData);
+            await _filesRepository.AddFile(fileData);
             return true;
         }
 
         public async Task<bool> PublishArtWork(string token, Guid id, PublishArtworkRequestDTO publishArtworkRequestDTO)
         {
-            User user = await _accountService.getUserByToken(token);
-            UploadProcess process = await _filesRepository.getUploadProcessById(id);
+            User user = await _accountService.GetUserByToken(token);
+
+            UploadProcess process = await _filesRepository.GetUploadProcessById(id);
+            if (user != process.Uploader)
+            {
+                return false;
+            }
+
+
             Artwork artwork = new Artwork()
             {
                 ArtType = publishArtworkRequestDTO.ArtType,
@@ -98,7 +105,7 @@ namespace praca_inzynierska_backend.Services.UploadService
             };
 
             await _filesRepository.AddArtwork(artwork);
-            await _filesRepository.setArtworkIdToFiles(process, artwork.Id);
+            await _filesRepository.SetArtworkIdToFiles(process, artwork.Id);
             return true;
         }
 

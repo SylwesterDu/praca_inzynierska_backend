@@ -12,7 +12,7 @@ namespace praca_inzynierska_backend.Services.AccountService
     public interface IAccountService
     {
         public JwtSecurityToken GetToken(List<Claim> claims);
-        Task<User> getUserByToken(string token);
+        Task<User> GetUserByToken(string token);
         Task<UserDTO> GetUserInfo(string token);
     }
 }

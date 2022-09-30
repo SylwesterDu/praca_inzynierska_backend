@@ -10,8 +10,8 @@ namespace praca_inzynierska_backend.Repositories.ArtworksRepository
     public interface IArtworksRepository
     {
         public Task<List<Artwork>> GetUserArtworks(Guid id);
-        Task<Artwork> getArtworkById(Guid id);
-        Task<IEnumerable<Comment>> getArtworkComments(Guid id);
-        Task addComment(Comment comment);
+        Task<Artwork> GetArtworkById(Guid id);
+        Task<IEnumerable<Comment>> GetArtworkComments(Guid id);
+        Task AddComment(Comment comment);
     }
 }

@@ -9,8 +9,8 @@ namespace praca_inzynierska_backend.Services.ArtworksService
     public interface IArtworksService
     {
         public Task<UserArtworksResponseDTO> GetUserArtworks(Guid id);
-        Task<ArtworkDetailsDTO> getArtworkDetails(Guid id);
-        Task<IEnumerable<CommentDTO>> getArtworkComments(Guid id);
+        Task<ArtworkDetailsDTO> GetArtworkDetails(Guid id);
+        Task<IEnumerable<CommentDTO>> GetArtworkComments(Guid id);
         Task AddComment(string token, Guid id, string content);
     }
 }

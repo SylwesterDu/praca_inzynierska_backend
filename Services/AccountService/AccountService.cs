@@ -39,15 +39,15 @@ namespace praca_inzynierska_backend.Services.AccountService
 
         }
 
-        public async Task<User> getUserByToken(string token)
+        public async Task<User> GetUserByToken(string token)
         {
-            User user = await _accountRepository.getUserByToken(token);
+            User user = await _accountRepository.GetUserByToken(token);
             return user;
         }
 
         public async Task<UserDTO> GetUserInfo(string token)
         {
-            User user = await getUserByToken(token);
+            User user = await GetUserByToken(token);
             return new UserDTO()
             {
                 Id = user.Id,

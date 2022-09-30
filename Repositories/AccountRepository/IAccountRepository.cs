@@ -8,6 +8,6 @@ namespace praca_inzynierska_backend.Repositories.AccountRepository
 {
     public interface IAccountRepository
     {
-        Task<User> getUserByToken(string token);
+        Task<User> GetUserByToken(string token);
     }
 }

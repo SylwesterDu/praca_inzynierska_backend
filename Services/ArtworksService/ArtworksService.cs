@@ -22,8 +22,8 @@ namespace praca_inzynierska_backend.Services.ArtworksService
 
         public async Task AddComment(string token, Guid id, string content)
         {
-            User user = await _accountRepository.getUserByToken(token);
-            Artwork artwork = await _artworksRepository.getArtworkById(id);
+            User user = await _accountRepository.GetUserByToken(token);
+            Artwork artwork = await _artworksRepository.GetArtworkById(id);
             Comment comment = new Comment()
             {
                 Artwork = artwork,
@@ -32,12 +32,12 @@ namespace praca_inzynierska_backend.Services.ArtworksService
                 Creator = user
             };
 
-            await _artworksRepository.addComment(comment);
+            await _artworksRepository.AddComment(comment);
         }
 
-        public async Task<IEnumerable<CommentDTO>> getArtworkComments(Guid id)
+        public async Task<IEnumerable<CommentDTO>> GetArtworkComments(Guid id)
         {
-            IEnumerable<Comment> comments = await _artworksRepository.getArtworkComments(id);
+            IEnumerable<Comment> comments = await _artworksRepository.GetArtworkComments(id);
 
             if (comments is null)
             {
@@ -54,10 +54,10 @@ namespace praca_inzynierska_backend.Services.ArtworksService
             });
         }
 
-        public async Task<ArtworkDetailsDTO> getArtworkDetails(Guid id)
+        public async Task<ArtworkDetailsDTO> GetArtworkDetails(Guid id)
         {
 
-            Artwork? artwork = await _artworksRepository.getArtworkById(id);
+            Artwork? artwork = await _artworksRepository.GetArtworkById(id);
             if (artwork is null)
             {
                 return null!;

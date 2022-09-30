@@ -54,7 +54,14 @@ namespace praca_inzynierska_backend.Controllers
             string token = values[0].Split(' ')[1];
             bool success = await _uploadService.PublishArtWork(token, id, publishArtworkRequestDTO);
 
-            return Ok();
+            if (success)
+            {
+                return Ok();
+            }
+            else
+            {
+                return Conflict("conflict between uploader and publisher!");
+            }
         }
     }
 }
