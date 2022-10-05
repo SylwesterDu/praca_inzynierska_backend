@@ -29,7 +29,7 @@ Obj/
 .vscode/
 
 #temp
-.files/
+files/
 
 # MSTest test Results
 [Tt]est[Rr]esult*/

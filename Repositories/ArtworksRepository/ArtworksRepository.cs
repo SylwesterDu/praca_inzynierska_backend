@@ -46,7 +46,8 @@ namespace praca_inzynierska_backend.Repositories.ArtworksRepository
         {
             User? user = await _context.Users!.Where(user => user.Id == id)
                 .Include(user => user.Artworks)!
-                .ThenInclude(artwork => artwork.Tags).FirstOrDefaultAsync();
+                .ThenInclude(artwork => artwork.Tags)
+                .FirstOrDefaultAsync();
 
             if (user is null)
             {
@@ -59,7 +60,11 @@ namespace praca_inzynierska_backend.Repositories.ArtworksRepository
 
             }
 
-            return user.Artworks;
+            List<Artwork> artworks = await _context.Artworks!.Where(artwork => artwork.Owner!.Id == id)
+                .Include(artwork => artwork.Genres)
+                .Include(artwork => artwork.Tags).ToListAsync();
+
+            return artworks;
         }
 
         public async Task AddComment(Comment comment)

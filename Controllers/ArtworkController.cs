@@ -24,7 +24,7 @@ namespace praca_inzynierska_backend.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetArtworkDetails(Guid id)
         {
-            ArtworkDetailsDTO dto = await _artworksService.getArtworkDetails(id);
+            ArtworkDetailsDTO dto = await _artworksService.GetArtworkDetails(id);
             if (dto is null)
             {
                 return NotFound("Artwork with given id does not exists!");
@@ -35,7 +35,7 @@ namespace praca_inzynierska_backend.Controllers
         [HttpGet("{id}/comments")]
         public async Task<IActionResult> GetArtworkComments(Guid id)
         {
-            IEnumerable<CommentDTO> dto = await _artworksService.getArtworkComments(id);
+            IEnumerable<CommentDTO> dto = await _artworksService.GetArtworkComments(id);
             if (dto is null)
             {
                 return NotFound("Artwork with given id does not exists!");

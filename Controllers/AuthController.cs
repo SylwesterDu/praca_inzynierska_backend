@@ -127,7 +127,7 @@ namespace praca_inzynierska_backend.Controllers
         {
             HttpContext.Request.Headers.TryGetValue("Authorization", out StringValues values);
             string token = values[0].Split(' ')[1];
-            User user = await _service.getUserByToken(token);
+            User user = await _service.GetUserByToken(token);
             await _userManager.DeleteAsync(user);
             return Ok();
         }
