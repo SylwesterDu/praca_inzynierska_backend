@@ -30,14 +30,25 @@ namespace praca_inzynierska_backend.Data
                 .WithOne(artwork => artwork.Owner);
 
             builder.Entity<Artwork>()
-                .HasMany<Comment>(artwork => artwork.Comments);
+                .HasMany<Comment>(artwork => artwork.Comments)
+                .WithOne(comment => comment.Artwork)
+                .OnDelete(DeleteBehavior.Cascade);
 
             builder.Entity<Artwork>()
-                .HasMany<Tag>(artwork => artwork.Tags);
+                .HasMany<Tag>(artwork => artwork.Tags)
+                .WithOne(tag => tag.Artwork)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<Artwork>()
+                .HasMany<FileData>(artwork => artwork.FilesData)
+                .WithOne(fileData => fileData.Artwork)
+                .OnDelete(DeleteBehavior.Cascade);
+
 
             builder.Entity<UploadProcess>()
                 .HasMany<FileData>(uploadProcess => uploadProcess.FilesData)
-                .WithOne(fileData => fileData.UploadProcess);
+                .WithOne(fileData => fileData.UploadProcess)
+                .OnDelete(DeleteBehavior.Cascade);
 
             base.OnModelCreating(builder);
         }

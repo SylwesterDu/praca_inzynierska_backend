@@ -72,5 +72,11 @@ namespace praca_inzynierska_backend.Repositories.ArtworksRepository
             await _context.Comments!.AddAsync(comment);
             await _context.SaveChangesAsync();
         }
+
+        public async Task DeleteArtwork(Artwork artwork)
+        {
+            _context.Artworks!.Remove(artwork);
+            await _context.SaveChangesAsync();
+        }
     }
 }

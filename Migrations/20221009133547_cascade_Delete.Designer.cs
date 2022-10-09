@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using praca_inzynierska_backend.Data;
 
@@ -11,9 +12,10 @@ using praca_inzynierska_backend.Data;
 namespace praca_inzynierska_backend.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20221009133547_cascade_Delete")]
+    partial class cascade_Delete
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -414,17 +416,13 @@ namespace praca_inzynierska_backend.Migrations
 
             modelBuilder.Entity("praca_inzynierska_backend.Data.Entities.FileData", b =>
                 {
-                    b.HasOne("praca_inzynierska_praca_inzynierska_backend.Data.Entities.Artwork", "Artwork")
+                    b.HasOne("praca_inzynierska_praca_inzynierska_backend.Data.Entities.Artwork", null)
                         .WithMany("FilesData")
-                        .HasForeignKey("ArtworkId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .HasForeignKey("ArtworkId");
 
                     b.HasOne("praca_inzynierska_praca_inzynierska_backend.Data.Entities.UploadProcess", "UploadProcess")
                         .WithMany("FilesData")
-                        .HasForeignKey("UploadProcessId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.Navigation("Artwork");
+                        .HasForeignKey("UploadProcessId");
 
                     b.Navigation("UploadProcess");
                 });

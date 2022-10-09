@@ -35,6 +35,26 @@ namespace praca_inzynierska_backend.Services.ArtworksService
             await _artworksRepository.AddComment(comment);
         }
 
+        public async Task<bool> DeleteArtwork(string token, Guid id)
+        {
+            User? user = await _accountRepository.GetUserByToken(token);
+            Artwork? artwork = await _artworksRepository.GetArtworkById(id);
+
+            if (artwork is null)
+            {
+                return false;
+            }
+
+            if (artwork.Owner != user)
+            {
+                return false;
+            }
+
+            await _artworksRepository.DeleteArtwork(artwork);
+
+            return true;
+        }
+
         public async Task<IEnumerable<CommentDTO>> GetArtworkComments(Guid id)
         {
             IEnumerable<Comment> comments = await _artworksRepository.GetArtworkComments(id);
@@ -83,25 +103,22 @@ namespace praca_inzynierska_backend.Services.ArtworksService
             };
         }
 
-        public async Task<UserArtworksResponseDTO> GetUserArtworks(Guid id)
+        public async Task<List<ArtworkDTO>> GetUserArtworks(Guid id)
         {
             List<Artwork> artworks = await _artworksRepository.GetUserArtworks(id);
-
-            UserArtworksResponseDTO dto = new UserArtworksResponseDTO();
-
-            dto.Artworks = artworks.Select(artwork => new ArtworkDTO()
+            List<ArtworkDTO> artworkDTOs = artworks.Select(artwork => new ArtworkDTO
             {
-                Id = artwork.Id,
-                Title = artwork.Title,
                 ArtType = artwork.ArtType,
-                Genres = artwork.Genres,
-                Tags = artwork.Tags!.Select(tag => tag.TagName).ToList()!,
-                UpVotes = artwork.UpVotes,
                 DownVotes = artwork.DownVotes,
+                Genres = artwork.Genres!.Select(genre => genre.GenreName).ToList()!,
+                Id = artwork.Id,
+                Tags = artwork.Tags!.Select(tag => tag.TagName).ToList()!,
+                Title = artwork.Title,
+                UpVotes = artwork.UpVotes,
                 Views = artwork.Views
             }).ToList();
-            return dto;
 
+            return artworkDTOs;
         }
     }
 }

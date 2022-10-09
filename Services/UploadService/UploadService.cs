@@ -105,7 +105,7 @@ namespace praca_inzynierska_backend.Services.UploadService
             };
 
             await _filesRepository.AddArtwork(artwork);
-            await _filesRepository.SetArtworkIdToFiles(process, artwork.Id);
+            await _filesRepository.SetArtworkToFiles(process, artwork.Id);
             return true;
         }
 

@@ -59,5 +59,25 @@ namespace praca_inzynierska_backend.Controllers
 
             return Ok();
         }
+
+        [Authorize]
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteArtwork(Guid id)
+        {
+            HttpContext.Request.Headers.TryGetValue("Authorization", out StringValues values);
+            string token = values[0].Split(' ')[1];
+
+            bool success = await _artworksService.DeleteArtwork(token, id);
+
+            if (!success)
+            {
+                return Conflict("owner and logged user aren't the same person!");
+            }
+
+            return Ok();
+
+        }
+
+
     }
 }

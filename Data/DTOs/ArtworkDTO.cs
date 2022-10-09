@@ -16,7 +16,7 @@ namespace praca_inzynierska_backend.Data.DTOs
         public int DownVotes { get; set; }
         public long Views { get; set; }
         public ArtType ArtType { get; set; }
-        public List<Genre>? Genres { get; set; }
+        public List<string>? Genres { get; set; }
         public List<string>? Tags { get; set; }
     }
 }

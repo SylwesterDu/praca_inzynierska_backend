@@ -12,6 +12,6 @@ namespace praca_inzynierska_backend.Data.Entities
         public UploadProcess? UploadProcess { get; set; }
         public string? FileName { get; set; }
         public string? Path { get; set; }
-        public Guid? ArtworkId { get; set; }
+        public Artwork? Artwork { get; set; }
     }
 }

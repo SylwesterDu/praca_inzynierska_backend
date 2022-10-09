@@ -14,6 +14,6 @@ namespace praca_inzynierska_backend.Repositories.FilesRepository
         Task<UploadProcess> GetUploadProcessById(Guid id);
         Task AddFile(FileData fileData);
         Task AddArtwork(Artwork artwork);
-        Task SetArtworkIdToFiles(UploadProcess process, Guid id);
+        Task SetArtworkToFiles(UploadProcess process, Guid id);
     }
 }

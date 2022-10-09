@@ -36,8 +36,21 @@ namespace praca_inzynierska_backend.Controllers
             {
                 return NotFound("User with given id does not exists!");
             }
-            UserArtworksResponseDTO dto = await _artworksService.GetUserArtworks(id);
-            return Ok(dto);
+            List<ArtworkDTO> artworks = await _artworksService.GetUserArtworks(id);
+            return Ok(artworks);
+        }
+
+        [Authorize]
+        [HttpGet("artworks")]
+        public async Task<IActionResult> GetArtworks()
+        {
+            HttpContext.Request.Headers.TryGetValue("Authorization", out StringValues values);
+            string token = values[0].Split(' ')[1];
+
+            User user = await _accountService.GetUserByToken(token);
+
+            List<ArtworkDTO> artworks = await _artworksService.GetUserArtworks(user.Id);
+            return Ok(artworks);
         }
 
         [Authorize]

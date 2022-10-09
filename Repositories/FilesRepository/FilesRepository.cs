@@ -47,11 +47,13 @@ namespace praca_inzynierska_backend.Repositories.FilesRepository
             return process!;
         }
 
-        public async Task SetArtworkIdToFiles(UploadProcess process, Guid id)
+        public async Task SetArtworkToFiles(UploadProcess process, Guid id)
         {
+            Artwork? artwork = await _context.Artworks!
+                .FirstOrDefaultAsync(artwork => artwork.Id == id);
             foreach (FileData fileData in process.FilesData!)
             {
-                fileData.ArtworkId = id;
+                fileData.Artwork = artwork;
             }
 
             await _context.SaveChangesAsync();

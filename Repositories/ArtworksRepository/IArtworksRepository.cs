@@ -13,5 +13,6 @@ namespace praca_inzynierska_backend.Repositories.ArtworksRepository
         Task<Artwork> GetArtworkById(Guid id);
         Task<IEnumerable<Comment>> GetArtworkComments(Guid id);
         Task AddComment(Comment comment);
+        Task DeleteArtwork(Artwork artwork);
     }
 }
