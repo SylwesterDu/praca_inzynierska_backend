@@ -4,12 +4,12 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using praca_inzynierska_backend.Data.DTOs;
-using praca_inzynierska_backend.Services.AccountService;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Primitives;
+using praca_inzynierska_backend.Data.DTOs;
+using praca_inzynierska_backend.Services.AccountService;
 using praca_inzynierska_praca_inzynierska_backend.Data.Entities;
 
 namespace praca_inzynierska_backend.Controllers
@@ -26,7 +26,7 @@ namespace praca_inzynierska_backend.Controllers
             UserManager<User> userManager,
             RoleManager<Role> roleManager,
             IAccountService service
-            )
+        )
         {
             _userManager = userManager;
             _roleManager = roleManager;
@@ -40,6 +40,7 @@ namespace praca_inzynierska_backend.Controllers
             {
                 return Conflict("Check your passoword!");
             }
+
             User user = await _userManager.FindByNameAsync(registerRequestDTO.Username);
             if (user is not null)
             {
@@ -52,20 +53,25 @@ namespace praca_inzynierska_backend.Controllers
                 return Conflict("Email is already used!");
             }
 
-            User newUser = new()
-            {
-                Id = new Guid(),
-                UserName = registerRequestDTO.Username,
-                Email = registerRequestDTO.Email,
+            User newUser =
+                new()
+                {
+                    Id = new Guid(),
+                    UserName = registerRequestDTO.Username,
+                    Email = registerRequestDTO.Email,
+                };
 
-            };
-
-            IdentityResult result = await _userManager.CreateAsync(newUser, registerRequestDTO.Password);
+            IdentityResult result = await _userManager.CreateAsync(
+                newUser,
+                registerRequestDTO.Password
+            );
             if (!result.Succeeded)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "Something went wrong. Try again" });
+                return StatusCode(
+                    StatusCodes.Status500InternalServerError,
+                    new { message = "Something went wrong. Try again" }
+                );
             }
-
 
             if (!(await _roleManager.RoleExistsAsync("standard_user")))
             {
@@ -75,8 +81,10 @@ namespace praca_inzynierska_backend.Controllers
             var roleResult = await _userManager.AddToRoleAsync(newUser, "standard_user");
             if (!roleResult.Succeeded)
             {
-
-                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "Something went wrong. Try again2" });
+                return StatusCode(
+                    StatusCodes.Status500InternalServerError,
+                    new { message = "Something went wrong. Try again2" }
+                );
             }
 
             return Ok("User created!");
@@ -110,15 +118,9 @@ namespace praca_inzynierska_backend.Controllers
                 authClaims.Add(new Claim(ClaimTypes.Role, userRole));
             }
 
-
             var token = _service.GetToken(authClaims);
 
-
-
-            return Ok(new
-            {
-                Jwt = new JwtSecurityTokenHandler().WriteToken(token)
-            });
+            return Ok(new { Jwt = new JwtSecurityTokenHandler().WriteToken(token) });
         }
 
         [Authorize]

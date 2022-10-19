@@ -172,7 +172,7 @@ namespace praca_inzynierska_backend.Migrations
                     b.Property<string>("Title")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("UpVotes")
+                    b.Property<int>("Upvotes")
                         .HasColumnType("int");
 
                     b.Property<long>("Views")

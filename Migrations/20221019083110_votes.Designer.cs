@@ -12,8 +12,8 @@ using praca_inzynierska_backend.Data;
 namespace praca_inzynierska_backend.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20221009133841_cascade_Delete1")]
-    partial class cascade_Delete1
+    [Migration("20221019083110_votes")]
+    partial class votes
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -23,6 +23,36 @@ namespace praca_inzynierska_backend.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
+
+            modelBuilder.Entity("ArtworkUser", b =>
+                {
+                    b.Property<Guid>("UpvotedById")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("UpvotesId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("UpvotedById", "UpvotesId");
+
+                    b.HasIndex("UpvotesId");
+
+                    b.ToTable("ArtworkUser");
+                });
+
+            modelBuilder.Entity("ArtworkUser1", b =>
+                {
+                    b.Property<Guid>("DownVotedById")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("DownVotesId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("DownVotedById", "DownVotesId");
+
+                    b.HasIndex("DownVotesId");
+
+                    b.ToTable("ArtworkUser1");
+                });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
                 {
@@ -160,8 +190,8 @@ namespace praca_inzynierska_backend.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("DownVotes")
-                        .HasColumnType("int");
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<Guid?>("OwnerId")
                         .HasColumnType("uniqueidentifier");
@@ -172,11 +202,11 @@ namespace praca_inzynierska_backend.Migrations
                     b.Property<string>("Title")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Upvotes")
-                        .HasColumnType("int");
-
                     b.Property<long>("Views")
                         .HasColumnType("bigint");
+
+                    b.Property<string>("description")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -363,6 +393,36 @@ namespace praca_inzynierska_backend.Migrations
                     b.ToTable("Tags");
                 });
 
+            modelBuilder.Entity("ArtworkUser", b =>
+                {
+                    b.HasOne("praca_inzynierska_praca_inzynierska_backend.Data.Entities.User", null)
+                        .WithMany()
+                        .HasForeignKey("UpvotedById")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("praca_inzynierska_praca_inzynierska_backend.Data.Entities.Artwork", null)
+                        .WithMany()
+                        .HasForeignKey("UpvotesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("ArtworkUser1", b =>
+                {
+                    b.HasOne("praca_inzynierska_praca_inzynierska_backend.Data.Entities.User", null)
+                        .WithMany()
+                        .HasForeignKey("DownVotedById")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("praca_inzynierska_praca_inzynierska_backend.Data.Entities.Artwork", null)
+                        .WithMany()
+                        .HasForeignKey("DownVotesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
                 {
                     b.HasOne("praca_inzynierska_praca_inzynierska_backend.Data.Entities.Role", null)
@@ -416,14 +476,17 @@ namespace praca_inzynierska_backend.Migrations
 
             modelBuilder.Entity("praca_inzynierska_backend.Data.Entities.FileData", b =>
                 {
-                    b.HasOne("praca_inzynierska_praca_inzynierska_backend.Data.Entities.Artwork", null)
+                    b.HasOne("praca_inzynierska_praca_inzynierska_backend.Data.Entities.Artwork", "Artwork")
                         .WithMany("FilesData")
-                        .HasForeignKey("ArtworkId");
+                        .HasForeignKey("ArtworkId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("praca_inzynierska_praca_inzynierska_backend.Data.Entities.UploadProcess", "UploadProcess")
                         .WithMany("FilesData")
                         .HasForeignKey("UploadProcessId")
                         .OnDelete(DeleteBehavior.Cascade);
+
+                    b.Navigation("Artwork");
 
                     b.Navigation("UploadProcess");
                 });

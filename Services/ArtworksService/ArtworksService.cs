@@ -14,7 +14,10 @@ namespace praca_inzynierska_backend.Services.ArtworksService
         private IArtworksRepository _artworksRepository;
         private IAccountRepository _accountRepository;
 
-        public ArtworksService(IArtworksRepository artworksRepository, IAccountRepository accountRepository)
+        public ArtworksService(
+            IArtworksRepository artworksRepository,
+            IAccountRepository accountRepository
+        )
         {
             _artworksRepository = artworksRepository;
             _accountRepository = accountRepository;
@@ -64,31 +67,30 @@ namespace praca_inzynierska_backend.Services.ArtworksService
                 return null!;
             }
 
-            return comments.Select(comment => new CommentDTO()
-            {
-                Content = comment.Content,
-                CreatedAt = comment.CreatedAt,
-                CreatorId = comment.Creator!.Id,
-                CreatorName = comment.Creator.UserName
-
-            });
+            return comments.Select(
+                comment =>
+                    new CommentDTO()
+                    {
+                        Content = comment.Content,
+                        CreatedAt = comment.CreatedAt,
+                        CreatorId = comment.Creator!.Id,
+                        CreatorName = comment.Creator.UserName
+                    }
+            );
         }
 
         public async Task<ArtworkDetailsDTO> GetArtworkDetails(Guid id)
         {
-
             Artwork? artwork = await _artworksRepository.GetArtworkById(id);
+            int upvotesCount = await _artworksRepository.GetArtworkUpvotesCount(id);
             if (artwork is null)
             {
                 return null!;
             }
 
-
             return new ArtworkDetailsDTO()
             {
                 ArtType = artwork!.ArtType,
-                DownVotes = artwork.DownVotes,
-                UpVotes = artwork.UpVotes,
                 Id = artwork.Id,
                 Owner = new UserDTO()
                 {
@@ -99,26 +101,42 @@ namespace praca_inzynierska_backend.Services.ArtworksService
                 Tags = artwork.Tags!.Select(tag => tag.TagName)!,
                 Genres = artwork.Genres!.Select(genre => genre.GenreName).ToList()!,
                 Title = artwork.Title,
-                Views = artwork.Views
+                Description = artwork.Description,
+                Views = artwork.Views,
+                Upvotes = upvotesCount,
+                Downvotes = 0
             };
         }
 
         public async Task<List<ArtworkDTO>> GetUserArtworks(Guid id)
         {
             List<Artwork> artworks = await _artworksRepository.GetUserArtworks(id);
-            List<ArtworkDTO> artworkDTOs = artworks.Select(artwork => new ArtworkDTO
-            {
-                ArtType = artwork.ArtType,
-                DownVotes = artwork.DownVotes,
-                Genres = artwork.Genres!.Select(genre => genre.GenreName).ToList()!,
-                Id = artwork.Id,
-                Tags = artwork.Tags!.Select(tag => tag.TagName).ToList()!,
-                Title = artwork.Title,
-                UpVotes = artwork.UpVotes,
-                Views = artwork.Views
-            }).ToList();
+            List<ArtworkDTO> artworkDTOs = artworks
+                .Select(
+                    artwork =>
+                        new ArtworkDTO
+                        {
+                            ArtType = artwork.ArtType,
+                            Genres = artwork.Genres!.Select(genre => genre.GenreName).ToList()!,
+                            Id = artwork.Id,
+                            Tags = artwork.Tags!.Select(tag => tag.TagName).ToList()!,
+                            Title = artwork.Title,
+                            Views = artwork.Views
+                        }
+                )
+                .ToList();
 
             return artworkDTOs;
+        }
+
+        public async Task<bool> UpvoteArtwork(string token, Guid id)
+        {
+            Guid userId = _accountRepository.GetUserIdFromToken(token);
+            User? user = await _accountRepository.GetUserWithUpvotesById(userId);
+            Artwork? artwork = await _artworksRepository.GetArtworkWithUpvotesById(id);
+            bool success = await _artworksRepository.UpvoteArtwork(user, artwork);
+
+            return success;
         }
     }
 }

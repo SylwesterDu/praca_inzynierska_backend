@@ -14,7 +14,6 @@ namespace praca_inzynierska_backend.Data
     {
         public AppDbContext(DbContextOptions options) : base(options) { }
 
-
         public override DbSet<User>? Users { get; set; }
         public DbSet<Artwork>? Artworks { get; set; }
         public DbSet<Comment>? Comments { get; set; }
@@ -25,27 +24,41 @@ namespace praca_inzynierska_backend.Data
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
-            builder.Entity<User>()
+            builder
+                .Entity<User>()
                 .HasMany<Artwork>(user => user.Artworks)
                 .WithOne(artwork => artwork.Owner);
 
-            builder.Entity<Artwork>()
+            builder
+                .Entity<User>()
+                .HasMany<Artwork>(user => user.Upvotes)
+                .WithMany(artwork => artwork.UpvotedBy);
+
+            builder
+                .Entity<User>()
+                .HasMany<Artwork>(user => user.DownVotes)
+                .WithMany(artwork => artwork.DownVotedBy);
+
+            builder
+                .Entity<Artwork>()
                 .HasMany<Comment>(artwork => artwork.Comments)
                 .WithOne(comment => comment.Artwork)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            builder.Entity<Artwork>()
+            builder
+                .Entity<Artwork>()
                 .HasMany<Tag>(artwork => artwork.Tags)
                 .WithOne(tag => tag.Artwork)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            builder.Entity<Artwork>()
+            builder
+                .Entity<Artwork>()
                 .HasMany<FileData>(artwork => artwork.FilesData)
                 .WithOne(fileData => fileData.Artwork)
                 .OnDelete(DeleteBehavior.Cascade);
 
-
-            builder.Entity<UploadProcess>()
+            builder
+                .Entity<UploadProcess>()
                 .HasMany<FileData>(uploadProcess => uploadProcess.FilesData)
                 .WithOne(fileData => fileData.UploadProcess)
                 .OnDelete(DeleteBehavior.Cascade);
@@ -57,6 +70,5 @@ namespace praca_inzynierska_backend.Data
         {
             //options.UseSqlServer("Data source=localhost; database=art_db; Trust Server Certificate=true; Trusted_Connection=false; User Id=SA; Password=zaq1@WSX");
         }
-
     }
 }

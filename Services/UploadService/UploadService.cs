@@ -17,7 +17,11 @@ namespace praca_inzynierska_backend.Services.UploadService
         private readonly IFilesRepository _filesRepository;
         private readonly IConfiguration _configuration;
 
-        public UploadService(IAccountService accountService, IFilesRepository filesRepository, IConfiguration configuration)
+        public UploadService(
+            IAccountService accountService,
+            IFilesRepository filesRepository,
+            IConfiguration configuration
+        )
         {
             _accountService = accountService;
             _filesRepository = filesRepository;
@@ -27,12 +31,13 @@ namespace praca_inzynierska_backend.Services.UploadService
         public async Task<UploadProcessDTO> CreateUploadProcess(string token)
         {
             User user = await _accountService.GetUserByToken(token);
-            UploadProcess process = new()
-            {
-                Id = new Guid(),
-                CreatedAt = DateTime.Now,
-                Uploader = user
-            };
+            UploadProcess process =
+                new()
+                {
+                    Id = new Guid(),
+                    CreatedAt = DateTime.Now,
+                    Uploader = user
+                };
             await _filesRepository.AddUploadProcess(process);
             return new UploadProcessDTO()
             {
@@ -41,8 +46,6 @@ namespace praca_inzynierska_backend.Services.UploadService
                 Uploader = process.Uploader.Id
             };
         }
-
-
 
         public async Task<bool> UploadFile(string token, IFormFile formFile, Guid id)
         {
@@ -53,14 +56,14 @@ namespace praca_inzynierska_backend.Services.UploadService
                 return false;
             }
 
-            FileData fileData = new()
-            {
-                UploadProcess = process,
-                FileName = Path.GetRandomFileName(),
-                Id = new Guid(),
-                Path = _configuration["FilesPath"],
-
-            };
+            FileData fileData =
+                new()
+                {
+                    UploadProcess = process,
+                    FileName = Path.GetRandomFileName(),
+                    Id = new Guid(),
+                    Path = _configuration["FilesPath"],
+                };
 
             if (!Directory.Exists(_configuration["FilesPath"]))
             {
@@ -72,12 +75,15 @@ namespace praca_inzynierska_backend.Services.UploadService
                 await formFile.CopyToAsync(stream);
             }
 
-
             await _filesRepository.AddFile(fileData);
             return true;
         }
 
-        public async Task<bool> PublishArtWork(string token, Guid id, PublishArtworkRequestDTO publishArtworkRequestDTO)
+        public async Task<bool> PublishArtWork(
+            string token,
+            Guid id,
+            PublishArtworkRequestDTO publishArtworkRequestDTO
+        )
         {
             User user = await _accountService.GetUserByToken(token);
 
@@ -87,27 +93,29 @@ namespace praca_inzynierska_backend.Services.UploadService
                 return false;
             }
 
-
             Artwork artwork = new Artwork()
             {
                 ArtType = publishArtworkRequestDTO.ArtType,
                 Title = publishArtworkRequestDTO.Title,
                 Tags = publishArtworkRequestDTO.Tags!.Select(tag => new Tag(tag)).ToList(),
-                Genres = publishArtworkRequestDTO.Genres!.Select(genre => new Genre(genre)).ToList(),
+                Genres = publishArtworkRequestDTO.Genres!
+                    .Select(genre => new Genre(genre))
+                    .ToList(),
                 Id = process.Id,
                 FilesData = process.FilesData,
                 Views = 0,
-                UpVotes = 0,
-                DownVotes = 0,
+                UpvotedBy = new List<User>(),
+                DownVotedBy = new List<User>(),
                 Owner = user,
                 Comments = new List<Comment>(),
-                Published = true
+                Published = true,
+                CreatedAt = DateTime.Now,
+                Description = publishArtworkRequestDTO.Description
             };
 
             await _filesRepository.AddArtwork(artwork);
             await _filesRepository.SetArtworkToFiles(process, artwork.Id);
             return true;
         }
-
     }
 }

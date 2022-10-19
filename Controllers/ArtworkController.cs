@@ -45,9 +45,11 @@ namespace praca_inzynierska_backend.Controllers
 
         [Authorize]
         [HttpPost("{id}/comment")]
-        public async Task<IActionResult> AddComment([FromRoute] Guid id, [FromBody] AddCommentDTO dto)
+        public async Task<IActionResult> AddComment(
+            [FromRoute] Guid id,
+            [FromBody] AddCommentDTO dto
+        )
         {
-
             HttpContext.Request.Headers.TryGetValue("Authorization", out StringValues values);
             string token = values[0].Split(' ')[1];
 
@@ -75,9 +77,23 @@ namespace praca_inzynierska_backend.Controllers
             }
 
             return Ok();
-
         }
 
+        [Authorize]
+        [HttpPut("{id}/upvote")]
+        public async Task<IActionResult> Upvote(Guid id)
+        {
+            HttpContext.Request.Headers.TryGetValue("Authorization", out StringValues values);
+            string token = values[0].Split(' ')[1];
 
+            bool success = await _artworksService.UpvoteArtwork(token, id);
+
+            if (!success)
+            {
+                return Conflict("You already upvoted this artwork!");
+            }
+
+            return Ok();
+        }
     }
 }

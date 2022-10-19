@@ -36,7 +36,7 @@ namespace praca_inzynierska_backend.Migrations
                     b.Property<Guid?>("OwnerId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("UpVotes")
+                    b.Property<int>("Upvotes")
                         .HasColumnType("int");
 
                     b.Property<long>("Views")
