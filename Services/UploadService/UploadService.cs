@@ -4,10 +4,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using praca_inzynierska_backend.Data.DTOs;
 using praca_inzynierska_backend.Data.Entities;
+using praca_inzynierska_backend.Misc;
 using praca_inzynierska_backend.Repositories.FilesRepository;
 using praca_inzynierska_backend.Services.AccountService;
-using praca_inzynierska_praca_inzynierska_backend.Data.Entities;
-using praca_inzynierska_praca_inzynierska_backend.Misc;
 
 namespace praca_inzynierska_backend.Services.UploadService
 {
@@ -104,8 +103,8 @@ namespace praca_inzynierska_backend.Services.UploadService
                 Id = process.Id,
                 FilesData = process.FilesData,
                 Views = 0,
-                UpvotedBy = new List<User>(),
-                DownVotedBy = new List<User>(),
+                Upvotes = new List<Upvote>(),
+                // DownVotedBy = new List<User>(),
                 Owner = user,
                 Comments = new List<Comment>(),
                 Published = true,

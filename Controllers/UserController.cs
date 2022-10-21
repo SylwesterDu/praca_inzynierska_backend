@@ -2,14 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using praca_inzynierska_backend.Data.DTOs;
-using praca_inzynierska_backend.Services.AccountService;
-using praca_inzynierska_backend.Services.ArtworksService;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Primitives;
-using praca_inzynierska_praca_inzynierska_backend.Data.Entities;
+using praca_inzynierska_backend.Data.DTOs;
+using praca_inzynierska_backend.Data.Entities;
+using praca_inzynierska_backend.Services.AccountService;
+using praca_inzynierska_backend.Services.ArtworksService;
 
 namespace praca_inzynierska_backend.Controllers
 {

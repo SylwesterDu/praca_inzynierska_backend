@@ -4,9 +4,9 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using praca_inzynierska_backend.Data;
 using Microsoft.EntityFrameworkCore;
-using praca_inzynierska_praca_inzynierska_backend.Data.Entities;
+using praca_inzynierska_backend.Data;
+using praca_inzynierska_backend.Data.Entities;
 
 namespace praca_inzynierska_backend.Repositories.AccountRepository
 {

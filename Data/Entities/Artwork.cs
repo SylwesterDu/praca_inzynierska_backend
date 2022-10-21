@@ -4,9 +4,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using praca_inzynierska_backend.Data.Entities;
-using praca_inzynierska_praca_inzynierska_backend.Misc;
+using praca_inzynierska_backend.Misc;
 
-namespace praca_inzynierska_praca_inzynierska_backend.Data.Entities
+namespace praca_inzynierska_backend.Data.Entities
 {
     public class Artwork
     {
@@ -16,8 +16,8 @@ namespace praca_inzynierska_praca_inzynierska_backend.Data.Entities
         public virtual User? Owner { get; set; }
         public DateTime CreatedAt { get; set; }
         public virtual List<Comment>? Comments { get; set; }
-        public List<User>? UpvotedBy { get; set; }
-        public List<User>? DownVotedBy { get; set; }
+        public List<Upvote>? Upvotes { get; set; }
+        public List<Downvote>? Downvotes { get; set; }
         public long Views { get; set; }
         public ArtType ArtType;
         public List<Genre>? Genres { get; set; }

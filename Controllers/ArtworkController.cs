@@ -2,11 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using praca_inzynierska_backend.Data.DTOs;
-using praca_inzynierska_backend.Services.ArtworksService;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Primitives;
+using praca_inzynierska_backend.Data.DTOs;
+using praca_inzynierska_backend.Services.ArtworksService;
 
 namespace praca_inzynierska_backend.Controllers
 {
@@ -91,6 +91,23 @@ namespace praca_inzynierska_backend.Controllers
             if (!success)
             {
                 return Conflict("You already upvoted this artwork!");
+            }
+
+            return Ok();
+        }
+
+        [Authorize]
+        [HttpPut("{id}/downvote")]
+        public async Task<IActionResult> Downvote(Guid id)
+        {
+            HttpContext.Request.Headers.TryGetValue("Authorization", out StringValues values);
+            string token = values[0].Split(' ')[1];
+
+            bool success = await _artworksService.DownvoteArtwork(token, id);
+
+            if (!success)
+            {
+                return Conflict("You already downvoted this artwork!");
             }
 
             return Ok();

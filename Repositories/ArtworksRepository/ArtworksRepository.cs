@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using praca_inzynierska_backend.Data;
 using praca_inzynierska_backend.Data.DTOs;
-using praca_inzynierska_praca_inzynierska_backend.Data.Entities;
+using praca_inzynierska_backend.Data.Entities;
 
 namespace praca_inzynierska_backend.Repositories.ArtworksRepository
 {
@@ -86,14 +86,15 @@ namespace praca_inzynierska_backend.Repositories.ArtworksRepository
             await _context.SaveChangesAsync();
         }
 
-        public async Task<bool> UpvoteArtwork(User user, Artwork artwork)
+        public async Task<bool> UpvoteArtwork(Upvote upvote)
         {
-            if (user!.Upvotes!.Contains(artwork))
+            Upvote? _upvote = await _context.Upvotes!.FirstOrDefaultAsync(u => u.Equals(upvote));
+            if (_upvote is not null)
             {
                 return false;
             }
-            user!.Upvotes!.Add(artwork);
-            artwork.UpvotedBy!.Add(user);
+
+            await _context.Upvotes!.AddAsync(upvote!);
             await _context.SaveChangesAsync();
             return true;
         }
@@ -102,7 +103,7 @@ namespace praca_inzynierska_backend.Repositories.ArtworksRepository
         {
             Artwork? artwork = await _context.Artworks!
                 .Where(artwork => artwork.Id == id)
-                .Include(artwork => artwork.UpvotedBy)
+                .Include(artwork => artwork.Upvotes)
                 .FirstOrDefaultAsync();
 
             return artwork!;
@@ -112,7 +113,7 @@ namespace praca_inzynierska_backend.Repositories.ArtworksRepository
         {
             Artwork? artwork = await _context.Artworks!
                 .Where(artwork => artwork.Id == id)
-                .Include(artwork => artwork.DownVotedBy)
+                .Include(artwork => artwork.Upvotes) //TODO: downvotes
                 .FirstOrDefaultAsync();
 
             return artwork!;
@@ -121,13 +122,58 @@ namespace praca_inzynierska_backend.Repositories.ArtworksRepository
         public async Task<int> GetArtworkUpvotesCount(Guid id)
         {
             int count = await _context.Artworks!.Where(artwork => artwork.Id == id)
-                .Select(artwork => artwork.UpvotedBy!.Count).FirstOrDefaultAsync();
-
-            // int count1 = await _context.Artworks!.Where(artwork => artwork.Id == id)
-            //     .GroupBy(artwork => artwork.UpvotedBy)
-            //     .Select(group => new {id = group.Key, count = group.Count()});
+                .Select(artwork => artwork.Upvotes!.Count).FirstOrDefaultAsync();
 
             return count;
         }
+
+        public async Task<int> GetArtworkDownvotesCount(Guid id)
+        {
+            int count = await _context.Artworks!.Where(artwork => artwork.Id == id)
+                .Select(artwork => artwork.Downvotes!.Count).FirstOrDefaultAsync();
+
+            return count;
+        }
+
+        public async Task<bool> DownvoteArtwork(Downvote downvote)
+        {
+            Downvote? _downvote = await _context.Downvotes!.FirstOrDefaultAsync(d => d.Equals(downvote));
+            if (_downvote is not null)
+            {
+                return false;
+            }
+
+            await _context.Downvotes!.AddAsync(downvote!);
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<Upvote> GetUpvote(Guid userId, Guid artworkId)
+        {
+            Upvote? upvote = await _context.Upvotes!
+                .FirstOrDefaultAsync(u => u.Artwork!.Id == artworkId && u.User!.Id == userId);
+            return upvote!;
+        }
+
+        public async Task DeleteUpvote(Upvote upvote)
+        {
+            _context.Upvotes!.Remove(upvote);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<Downvote> GetDownvote(Guid userId, Guid artworkId)
+        {
+            Downvote? downvote = await _context.Downvotes!
+                .FirstOrDefaultAsync(d => d.Artwork!.Id == artworkId && d.User!.Id == userId);
+            return downvote!;
+        }
+
+        public async Task DeleteDownvote(Downvote downvote)
+        {
+            _context.Downvotes!.Remove(downvote);
+            await _context.SaveChangesAsync();
+        }
+
+
     }
 }

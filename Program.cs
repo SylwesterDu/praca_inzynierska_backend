@@ -1,16 +1,16 @@
 using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using praca_inzynierska_backend.Data;
+using praca_inzynierska_backend.Data.Entities;
 using praca_inzynierska_backend.Repositories.AccountRepository;
 using praca_inzynierska_backend.Repositories.ArtworksRepository;
 using praca_inzynierska_backend.Repositories.FilesRepository;
 using praca_inzynierska_backend.Services.AccountService;
 using praca_inzynierska_backend.Services.ArtworksService;
 using praca_inzynierska_backend.Services.UploadService;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using praca_inzynierska_praca_inzynierska_backend.Data.Entities;
 
 var builder = WebApplication.CreateBuilder(args);
 

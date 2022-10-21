@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace praca_inzynierska_praca_inzynierska_backend.Misc
+namespace praca_inzynierska_backend.Misc
 {
     public record Genre
     {

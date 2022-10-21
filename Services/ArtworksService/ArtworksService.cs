@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using praca_inzynierska_backend.Data.DTOs;
+using praca_inzynierska_backend.Data.Entities;
 using praca_inzynierska_backend.Repositories.AccountRepository;
 using praca_inzynierska_backend.Repositories.ArtworksRepository;
-using praca_inzynierska_praca_inzynierska_backend.Data.Entities;
 
 namespace praca_inzynierska_backend.Services.ArtworksService
 {
@@ -58,6 +58,38 @@ namespace praca_inzynierska_backend.Services.ArtworksService
             return true;
         }
 
+        public async Task<bool> DownvoteArtwork(string token, Guid id)
+        {
+            Guid userId = _accountRepository.GetUserIdFromToken(token);
+            User? user = await _accountRepository.GetUserWithUpvotesById(userId);
+            Artwork? artwork = await _artworksRepository.GetArtworkWithUpvotesById(id);
+
+            Downvote? downvote = await _artworksRepository.GetDownvote(userId, id);
+
+            if (downvote is not null)
+            {
+                return false;
+            }
+
+            Upvote upvote = await _artworksRepository.GetUpvote(userId, id);
+            if (upvote is not null)
+            {
+                await _artworksRepository.DeleteUpvote(upvote);
+            }
+
+
+
+            downvote = new Downvote()
+            {
+                Artwork = artwork,
+                User = user,
+                Id = new Guid()
+            };
+            bool success = await _artworksRepository.DownvoteArtwork(downvote);
+
+            return success;
+        }
+
         public async Task<IEnumerable<CommentDTO>> GetArtworkComments(Guid id)
         {
             IEnumerable<Comment> comments = await _artworksRepository.GetArtworkComments(id);
@@ -83,6 +115,7 @@ namespace praca_inzynierska_backend.Services.ArtworksService
         {
             Artwork? artwork = await _artworksRepository.GetArtworkById(id);
             int upvotesCount = await _artworksRepository.GetArtworkUpvotesCount(id);
+            int downvotesCount = await _artworksRepository.GetArtworkDownvotesCount(id);
             if (artwork is null)
             {
                 return null!;
@@ -104,7 +137,7 @@ namespace praca_inzynierska_backend.Services.ArtworksService
                 Description = artwork.Description,
                 Views = artwork.Views,
                 Upvotes = upvotesCount,
-                Downvotes = 0
+                Downvotes = downvotesCount
             };
         }
 
@@ -132,9 +165,29 @@ namespace praca_inzynierska_backend.Services.ArtworksService
         public async Task<bool> UpvoteArtwork(string token, Guid id)
         {
             Guid userId = _accountRepository.GetUserIdFromToken(token);
+
             User? user = await _accountRepository.GetUserWithUpvotesById(userId);
             Artwork? artwork = await _artworksRepository.GetArtworkWithUpvotesById(id);
-            bool success = await _artworksRepository.UpvoteArtwork(user, artwork);
+
+            Upvote? upvote = await _artworksRepository.GetUpvote(userId, id);
+            if (upvote is not null)
+            {
+                return false;
+            }
+
+            Downvote? downvote = await _artworksRepository.GetDownvote(userId, id);
+            if (downvote is not null)
+            {
+                await _artworksRepository.DeleteDownvote(downvote);
+            }
+
+            upvote = new Upvote()
+            {
+                Artwork = artwork,
+                User = user,
+                Id = new Guid()
+            };
+            bool success = await _artworksRepository.UpvoteArtwork(upvote);
 
             return success;
         }

@@ -5,8 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using praca_inzynierska_backend.Data.Entities;
-using praca_inzynierska_praca_inzynierska_backend.Data.Entities;
-using praca_inzynierska_praca_inzynierska_backend.Misc;
+using praca_inzynierska_backend.Misc;
 
 namespace praca_inzynierska_backend.Data
 {
@@ -21,6 +20,8 @@ namespace praca_inzynierska_backend.Data
         public DbSet<Genre>? Genres { get; set; }
         public DbSet<UploadProcess>? UploadProcesses { get; set; }
         public DbSet<FileData>? FilesData { get; set; }
+        public DbSet<Upvote>? Upvotes { get; set; }
+        public DbSet<Downvote>? Downvotes { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -30,14 +31,34 @@ namespace praca_inzynierska_backend.Data
                 .WithOne(artwork => artwork.Owner);
 
             builder
-                .Entity<User>()
-                .HasMany<Artwork>(user => user.Upvotes)
-                .WithMany(artwork => artwork.UpvotedBy);
+                .Entity<Upvote>()
+                .HasOne<User>(upvote => upvote.User)
+                .WithMany(user => user.Upvotes);
 
             builder
-                .Entity<User>()
-                .HasMany<Artwork>(user => user.DownVotes)
-                .WithMany(artwork => artwork.DownVotedBy);
+                .Entity<Upvote>()
+                .HasOne<Artwork>(upvote => upvote.Artwork)
+                .WithMany(artwork => artwork.Upvotes);
+
+            builder
+                .Entity<Downvote>()
+                .HasOne<User>(downvote => downvote.User)
+                .WithMany(user => user.Downvotes);
+
+            builder
+                .Entity<Downvote>()
+                .HasOne<Artwork>(downvote => downvote.Artwork)
+                .WithMany(artwork => artwork.Downvotes);
+
+
+            // builder
+            //     .Entity<User>()
+            //     .HasMany<Upvote>(user => user.Upvotes)
+            //     .WithOne(upvote => upvote.User);
+
+            // builder.Entity<Artwork>()
+            //     .HasMany<Upvote>(artwork => artwork.Upvotes)
+            //     .WithOne(upvote => upvote.Artwork);
 
             builder
                 .Entity<Artwork>()

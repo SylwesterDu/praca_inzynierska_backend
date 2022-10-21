@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 
-namespace praca_inzynierska_praca_inzynierska_backend.Data.Entities
+namespace praca_inzynierska_backend.Data.Entities
 {
     public class User : IdentityUser<Guid>
     {
@@ -14,8 +14,8 @@ namespace praca_inzynierska_praca_inzynierska_backend.Data.Entities
         }
 
         public List<Artwork>? Artworks { get; set; }
-        public List<Artwork>? Upvotes { get; set; }
-        public List<Artwork>? DownVotes { get; set; }
+        public List<Upvote>? Upvotes { get; set; }
+        public List<Downvote>? Downvotes { get; set; }
         public List<Comment>? Comments { get; set; }
     }
 }
