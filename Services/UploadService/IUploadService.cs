@@ -9,8 +9,12 @@ namespace praca_inzynierska_backend.Services.UploadService
 {
     public interface IUploadService
     {
-        Task<UploadProcessDTO> CreateUploadProcess(string token);
+        Task<UploadProcessDTO> CreateArtwork(string token);
         Task<bool> UploadFile(string token, IFormFile formFile, Guid id);
-        Task<bool> PublishArtWork(string token, Guid id, PublishArtworkRequestDTO publishArtworkRequestDTO);
+        Task<bool> PublishArtWork(
+            string token,
+            Guid id,
+            PublishArtworkRequestDTO publishArtworkRequestDTO
+        );
     }
 }

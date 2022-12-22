@@ -14,7 +14,7 @@ namespace praca_inzynierska_backend.Data.DTOs
         //public virtual User? Owner { get; set; }
         //public virtual List<Comment>? Comments { get; set; }
         public int Upvotes { get; set; }
-        public int DownVotes { get; set; }
+        public int Downvotes { get; set; }
         public long Views { get; set; }
         public ArtType ArtType { get; set; }
         public List<string>? Genres { get; set; }

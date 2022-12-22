@@ -24,5 +24,8 @@ namespace praca_inzynierska_backend.Repositories.ArtworksRepository
         Task DeleteUpvote(Upvote upvote);
         Task<Downvote> GetDownvote(Guid userId, Guid artworkId);
         Task DeleteDownvote(Downvote downvote);
+        Task AddArtwork(Artwork artwork);
+        Task SaveFile(Artwork artwork);
+        Task SaveArtwork(Artwork artwork);
     }
 }

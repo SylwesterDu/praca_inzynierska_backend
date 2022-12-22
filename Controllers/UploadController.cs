@@ -22,21 +22,23 @@ namespace praca_inzynierska_backend.Controllers
             _uploadService = service;
         }
 
-
         [Authorize]
         [HttpGet]
         public async Task<IActionResult> Begin()
         {
             HttpContext.Request.Headers.TryGetValue("Authorization", out StringValues values);
             string token = values[0].Split(' ')[1];
-            UploadProcessDTO processDTO = await _uploadService.CreateUploadProcess(token);
+            UploadProcessDTO processDTO = await _uploadService.CreateArtwork(token);
 
             return Ok(processDTO);
         }
 
         [Authorize]
         [HttpPost("{id}")]
-        public async Task<IActionResult> UploadFile(IFormFile formFile, [FromRoute] Guid id)
+        public async Task<IActionResult> UploadFile(
+            [FromForm] IFormFile formFile,
+            [FromRoute] Guid id
+        )
         {
             HttpContext.Request.Headers.TryGetValue("Authorization", out StringValues values);
             string token = values[0].Split(' ')[1];
@@ -48,7 +50,10 @@ namespace praca_inzynierska_backend.Controllers
 
         [Authorize]
         [HttpPost("{id}/publish")]
-        public async Task<IActionResult> Publish([FromRoute] Guid id, [FromBody] PublishArtworkRequestDTO publishArtworkRequestDTO)
+        public async Task<IActionResult> Publish(
+            [FromRoute] Guid id,
+            [FromBody] PublishArtworkRequestDTO publishArtworkRequestDTO
+        )
         {
             HttpContext.Request.Headers.TryGetValue("Authorization", out StringValues values);
             string token = values[0].Split(' ')[1];

@@ -7,9 +7,9 @@ using praca_inzynierska_backend.Data;
 using praca_inzynierska_backend.Data.Entities;
 using praca_inzynierska_backend.Repositories.AccountRepository;
 using praca_inzynierska_backend.Repositories.ArtworksRepository;
-using praca_inzynierska_backend.Repositories.FilesRepository;
 using praca_inzynierska_backend.Services.AccountService;
 using praca_inzynierska_backend.Services.ArtworksService;
+using praca_inzynierska_backend.Services.CloudflareFileService;
 using praca_inzynierska_backend.Services.UploadService;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -22,19 +22,8 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddDbContext<AppDbContext>(opt =>
 {
-    opt.UseSqlServer(configuration["ConnectionStrings:db"]);
+    opt.UseNpgsql(configuration["ConnectionStrings:db"]);
 });
-
-// builder.Services.AddDbContextPool<AppDbContext>(opt =>
-// {
-//     opt.UseSqlServer(configuration["ConnectionStrings:db"]);
-
-// });
-
-// builder.Services.AddDbContextFactory<AppDbContext>(opt =>
-// {
-//     opt.UseSqlServer(configuration["ConnectionStrings:db"]);
-// });
 
 builder.Services
     .AddIdentity<User, Role>()
@@ -69,8 +58,10 @@ builder.Services.AddScoped<IUploadService, UploadService>();
 builder.Services.AddScoped<IArtworksService, ArtworksService>();
 
 builder.Services.AddScoped<IAccountRepository, AccountRepository>();
-builder.Services.AddScoped<IFilesRepository, FilesRepository>();
+
+// builder.Services.AddScoped<IFilesRepository, FilesRepository>();
 builder.Services.AddScoped<IArtworksRepository, ArtworksRepository>();
+builder.Services.AddSingleton<ICloudflareFileService, CloudflareFileService>();
 builder.Services.AddCors(
     o =>
         o.AddPolicy(
@@ -82,6 +73,8 @@ builder.Services.AddCors(
         )
 );
 var app = builder.Build();
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+
 app.UseCors("CorsPolicy");
 
 // Configure the HTTP request pipeline.
@@ -91,7 +84,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+// app.UseHttpsRedirection();
 
 app.UseRouting();
 app.UseAuthentication();

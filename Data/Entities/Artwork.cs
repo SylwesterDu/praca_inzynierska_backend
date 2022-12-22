@@ -19,10 +19,10 @@ namespace praca_inzynierska_backend.Data.Entities
         public List<Upvote>? Upvotes { get; set; }
         public List<Downvote>? Downvotes { get; set; }
         public long Views { get; set; }
-        public ArtType ArtType;
+        public ArtType ArtType { get; set; }
         public List<Genre>? Genres { get; set; }
         public List<Tag>? Tags { get; set; }
-        public List<FileData>? FilesData { get; set; }
+        public List<ArtworkFile>? Files { get; set; }
         public bool Published { get; set; }
     }
 }

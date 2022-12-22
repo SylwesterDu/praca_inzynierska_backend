@@ -41,7 +41,7 @@ namespace praca_inzynierska_backend.Repositories.ArtworksRepository
                 .Include(artwork => artwork.Owner)
                 .Include(artwork => artwork.Tags)
                 .Include(artwork => artwork.Genres)
-                .Include(artwork => artwork.FilesData)
+                .Include(artwork => artwork.Files)
                 .FirstOrDefaultAsync();
 
             return artwork!;
@@ -49,26 +49,12 @@ namespace praca_inzynierska_backend.Repositories.ArtworksRepository
 
         public async Task<List<Artwork>> GetUserArtworks(Guid id)
         {
-            User? user = await _context.Users!
-                .Where(user => user.Id == id)
-                .Include(user => user.Artworks)!
-                .ThenInclude(artwork => artwork.Tags)
-                .FirstOrDefaultAsync();
-
-            if (user is null)
-            {
-                return new List<Artwork>();
-            }
-
-            if (user.Artworks is null)
-            {
-                return new List<Artwork>();
-            }
-
             List<Artwork> artworks = await _context.Artworks!
-                .Where(artwork => artwork.Owner!.Id == id)
+                .Where(artwork => artwork.Owner!.Id == id && artwork.Published)
                 .Include(artwork => artwork.Genres)
                 .Include(artwork => artwork.Tags)
+                .Include(artwork => artwork.Upvotes)
+                .Include(artwork => artwork.Downvotes)
                 .ToListAsync();
 
             return artworks;
@@ -121,23 +107,29 @@ namespace praca_inzynierska_backend.Repositories.ArtworksRepository
 
         public async Task<int> GetArtworkUpvotesCount(Guid id)
         {
-            int count = await _context.Artworks!.Where(artwork => artwork.Id == id)
-                .Select(artwork => artwork.Upvotes!.Count).FirstOrDefaultAsync();
+            int count = await _context.Artworks!
+                .Where(artwork => artwork.Id == id)
+                .Select(artwork => artwork.Upvotes!.Count)
+                .FirstOrDefaultAsync();
 
             return count;
         }
 
         public async Task<int> GetArtworkDownvotesCount(Guid id)
         {
-            int count = await _context.Artworks!.Where(artwork => artwork.Id == id)
-                .Select(artwork => artwork.Downvotes!.Count).FirstOrDefaultAsync();
+            int count = await _context.Artworks!
+                .Where(artwork => artwork.Id == id)
+                .Select(artwork => artwork.Downvotes!.Count)
+                .FirstOrDefaultAsync();
 
             return count;
         }
 
         public async Task<bool> DownvoteArtwork(Downvote downvote)
         {
-            Downvote? _downvote = await _context.Downvotes!.FirstOrDefaultAsync(d => d.Equals(downvote));
+            Downvote? _downvote = await _context.Downvotes!.FirstOrDefaultAsync(
+                d => d.Equals(downvote)
+            );
             if (_downvote is not null)
             {
                 return false;
@@ -150,8 +142,9 @@ namespace praca_inzynierska_backend.Repositories.ArtworksRepository
 
         public async Task<Upvote> GetUpvote(Guid userId, Guid artworkId)
         {
-            Upvote? upvote = await _context.Upvotes!
-                .FirstOrDefaultAsync(u => u.Artwork!.Id == artworkId && u.User!.Id == userId);
+            Upvote? upvote = await _context.Upvotes!.FirstOrDefaultAsync(
+                u => u.Artwork!.Id == artworkId && u.User!.Id == userId
+            );
             return upvote!;
         }
 
@@ -163,8 +156,9 @@ namespace praca_inzynierska_backend.Repositories.ArtworksRepository
 
         public async Task<Downvote> GetDownvote(Guid userId, Guid artworkId)
         {
-            Downvote? downvote = await _context.Downvotes!
-                .FirstOrDefaultAsync(d => d.Artwork!.Id == artworkId && d.User!.Id == userId);
+            Downvote? downvote = await _context.Downvotes!.FirstOrDefaultAsync(
+                d => d.Artwork!.Id == artworkId && d.User!.Id == userId
+            );
             return downvote!;
         }
 
@@ -174,6 +168,20 @@ namespace praca_inzynierska_backend.Repositories.ArtworksRepository
             await _context.SaveChangesAsync();
         }
 
+        public async Task AddArtwork(Artwork artwork)
+        {
+            await _context.Artworks!.AddAsync(artwork);
+            await _context.SaveChangesAsync();
+        }
 
+        public async Task SaveFile(Artwork artwork)
+        {
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task SaveArtwork(Artwork artwork)
+        {
+            await _context.SaveChangesAsync();
+        }
     }
 }

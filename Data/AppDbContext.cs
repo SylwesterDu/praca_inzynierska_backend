@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Npgsql;
 using praca_inzynierska_backend.Data.Entities;
 using praca_inzynierska_backend.Misc;
 
@@ -13,18 +14,24 @@ namespace praca_inzynierska_backend.Data
     {
         public AppDbContext(DbContextOptions options) : base(options) { }
 
+        static AppDbContext()
+        {
+            NpgsqlConnection.GlobalTypeMapper.MapEnum<ArtType>();
+        }
+
         public override DbSet<User>? Users { get; set; }
         public DbSet<Artwork>? Artworks { get; set; }
         public DbSet<Comment>? Comments { get; set; }
         public DbSet<Tag>? Tags { get; set; }
         public DbSet<Genre>? Genres { get; set; }
-        public DbSet<UploadProcess>? UploadProcesses { get; set; }
-        public DbSet<FileData>? FilesData { get; set; }
         public DbSet<Upvote>? Upvotes { get; set; }
         public DbSet<Downvote>? Downvotes { get; set; }
+        public DbSet<ArtworkFile>? Files { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
+            builder.HasPostgresEnum<ArtType>();
+
             builder
                 .Entity<User>()
                 .HasMany<Artwork>(user => user.Artworks)
@@ -50,16 +57,6 @@ namespace praca_inzynierska_backend.Data
                 .HasOne<Artwork>(downvote => downvote.Artwork)
                 .WithMany(artwork => artwork.Downvotes);
 
-
-            // builder
-            //     .Entity<User>()
-            //     .HasMany<Upvote>(user => user.Upvotes)
-            //     .WithOne(upvote => upvote.User);
-
-            // builder.Entity<Artwork>()
-            //     .HasMany<Upvote>(artwork => artwork.Upvotes)
-            //     .WithOne(upvote => upvote.Artwork);
-
             builder
                 .Entity<Artwork>()
                 .HasMany<Comment>(artwork => artwork.Comments)
@@ -74,15 +71,8 @@ namespace praca_inzynierska_backend.Data
 
             builder
                 .Entity<Artwork>()
-                .HasMany<FileData>(artwork => artwork.FilesData)
-                .WithOne(fileData => fileData.Artwork)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            builder
-                .Entity<UploadProcess>()
-                .HasMany<FileData>(uploadProcess => uploadProcess.FilesData)
-                .WithOne(fileData => fileData.UploadProcess)
-                .OnDelete(DeleteBehavior.Cascade);
+                .HasMany(artwork => artwork.Files)
+                .WithOne(file => file.Artwork);
 
             base.OnModelCreating(builder);
         }

@@ -6,6 +6,7 @@ using praca_inzynierska_backend.Data.DTOs;
 using praca_inzynierska_backend.Data.Entities;
 using praca_inzynierska_backend.Repositories.AccountRepository;
 using praca_inzynierska_backend.Repositories.ArtworksRepository;
+using praca_inzynierska_backend.Services.CloudflareFileService;
 
 namespace praca_inzynierska_backend.Services.ArtworksService
 {
@@ -13,14 +14,17 @@ namespace praca_inzynierska_backend.Services.ArtworksService
     {
         private IArtworksRepository _artworksRepository;
         private IAccountRepository _accountRepository;
+        private ICloudflareFileService _cloudflareFileService;
 
         public ArtworksService(
             IArtworksRepository artworksRepository,
-            IAccountRepository accountRepository
+            IAccountRepository accountRepository,
+            ICloudflareFileService cloudflareFileService
         )
         {
             _artworksRepository = artworksRepository;
             _accountRepository = accountRepository;
+            _cloudflareFileService = cloudflareFileService;
         }
 
         public async Task AddComment(string token, Guid id, string content)
@@ -77,8 +81,6 @@ namespace praca_inzynierska_backend.Services.ArtworksService
                 await _artworksRepository.DeleteUpvote(upvote);
             }
 
-
-
             downvote = new Downvote()
             {
                 Artwork = artwork,
@@ -130,7 +132,9 @@ namespace praca_inzynierska_backend.Services.ArtworksService
                     Username = artwork.Owner!.UserName,
                     Id = artwork.Owner!.Id
                 },
-                resourceUrls = artwork.FilesData!.Select(filedata => filedata.FileName).ToList()!,
+                resourceUrls = artwork.Files!
+                    .Select(file => _cloudflareFileService.GetFileUrl(file.Key!))
+                    .ToList()!,
                 Tags = artwork.Tags!.Select(tag => tag.TagName)!,
                 Genres = artwork.Genres!.Select(genre => genre.GenreName).ToList()!,
                 Title = artwork.Title,
@@ -154,7 +158,9 @@ namespace praca_inzynierska_backend.Services.ArtworksService
                             Id = artwork.Id,
                             Tags = artwork.Tags!.Select(tag => tag.TagName).ToList()!,
                             Title = artwork.Title,
-                            Views = artwork.Views
+                            Views = artwork.Views,
+                            Upvotes = artwork.Upvotes!.Count,
+                            Downvotes = artwork.Downvotes!.Count
                         }
                 )
                 .ToList();

@@ -5,76 +5,67 @@ using System.Threading.Tasks;
 using praca_inzynierska_backend.Data.DTOs;
 using praca_inzynierska_backend.Data.Entities;
 using praca_inzynierska_backend.Misc;
-using praca_inzynierska_backend.Repositories.FilesRepository;
+using praca_inzynierska_backend.Repositories.ArtworksRepository;
 using praca_inzynierska_backend.Services.AccountService;
+using praca_inzynierska_backend.Services.CloudflareFileService;
 
 namespace praca_inzynierska_backend.Services.UploadService
 {
     public class UploadService : IUploadService
     {
         private readonly IAccountService _accountService;
-        private readonly IFilesRepository _filesRepository;
+        private readonly IArtworksRepository _artworksRepository;
+        private readonly ICloudflareFileService _cloudflareFileService;
         private readonly IConfiguration _configuration;
 
         public UploadService(
             IAccountService accountService,
-            IFilesRepository filesRepository,
-            IConfiguration configuration
+            IConfiguration configuration,
+            IArtworksRepository artworksRepository,
+            ICloudflareFileService cloudflareFileService
         )
         {
             _accountService = accountService;
-            _filesRepository = filesRepository;
             _configuration = configuration;
+            _artworksRepository = artworksRepository;
+            _cloudflareFileService = cloudflareFileService;
         }
 
-        public async Task<UploadProcessDTO> CreateUploadProcess(string token)
+        public async Task<UploadProcessDTO> CreateArtwork(string token)
         {
             User user = await _accountService.GetUserByToken(token);
-            UploadProcess process =
-                new()
-                {
-                    Id = new Guid(),
-                    CreatedAt = DateTime.Now,
-                    Uploader = user
-                };
-            await _filesRepository.AddUploadProcess(process);
-            return new UploadProcessDTO()
+            Guid artworkId = Guid.NewGuid();
+            Artwork artwork = new Artwork()
             {
-                CreatedAt = process.CreatedAt,
-                Id = process.Id,
-                Uploader = process.Uploader.Id
+                Id = artworkId,
+                Published = false,
+                Owner = user,
+                Upvotes = new List<Upvote>(),
+                Downvotes = new List<Downvote>(),
+                Views = 0
             };
+            await _artworksRepository.AddArtwork(artwork);
+            return new UploadProcessDTO() { Id = artworkId, };
         }
 
         public async Task<bool> UploadFile(string token, IFormFile formFile, Guid id)
         {
             User user = await _accountService.GetUserByToken(token);
-            UploadProcess process = await _filesRepository.GetUploadProcessById(id);
-            if (process.Uploader != user)
+            Artwork artwork = await _artworksRepository.GetArtworkById(id);
+
+            string key = await _cloudflareFileService.UploadFile(id, formFile);
+
+            ArtworkFile file = new ArtworkFile()
             {
-                return false;
-            }
+                Id = new Guid(),
+                Artwork = artwork,
+                Key = key,
+                MimeType = formFile.ContentType
+            };
 
-            FileData fileData =
-                new()
-                {
-                    UploadProcess = process,
-                    FileName = Path.GetRandomFileName(),
-                    Id = new Guid(),
-                    Path = _configuration["FilesPath"],
-                };
+            artwork.Files!.Add(file);
 
-            if (!Directory.Exists(_configuration["FilesPath"]))
-            {
-                Directory.CreateDirectory(_configuration["FilesPath"]);
-            }
-
-            using (var stream = System.IO.File.Create(fileData.Path + "/" + fileData.FileName))
-            {
-                await formFile.CopyToAsync(stream);
-            }
-
-            await _filesRepository.AddFile(fileData);
+            await _artworksRepository.SaveFile(artwork);
             return true;
         }
 
@@ -86,34 +77,23 @@ namespace praca_inzynierska_backend.Services.UploadService
         {
             User user = await _accountService.GetUserByToken(token);
 
-            UploadProcess process = await _filesRepository.GetUploadProcessById(id);
-            if (user != process.Uploader)
-            {
-                return false;
-            }
+            Artwork artwork = await _artworksRepository.GetArtworkById(id);
 
-            Artwork artwork = new Artwork()
-            {
-                ArtType = publishArtworkRequestDTO.ArtType,
-                Title = publishArtworkRequestDTO.Title,
-                Tags = publishArtworkRequestDTO.Tags!.Select(tag => new Tag(tag)).ToList(),
-                Genres = publishArtworkRequestDTO.Genres!
-                    .Select(genre => new Genre(genre))
-                    .ToList(),
-                Id = process.Id,
-                FilesData = process.FilesData,
-                Views = 0,
-                Upvotes = new List<Upvote>(),
-                // DownVotedBy = new List<User>(),
-                Owner = user,
-                Comments = new List<Comment>(),
-                Published = true,
-                CreatedAt = DateTime.Now,
-                Description = publishArtworkRequestDTO.Description
-            };
+            artwork.ArtType = publishArtworkRequestDTO.ArtType;
+            artwork.Comments = new List<Comment>();
+            artwork.CreatedAt = DateTime.Now;
+            artwork.Title = publishArtworkRequestDTO.Title;
+            artwork.Description = publishArtworkRequestDTO.Description;
+            artwork.Genres = publishArtworkRequestDTO.Genres!
+                .Select(genre => new Genre(genre) { Id = new Guid() })
+                .ToList();
+            artwork.Tags = publishArtworkRequestDTO.Tags!
+                .Select(tag => new Tag(tag) { Id = new Guid() })
+                .ToList();
+            artwork.Published = true;
 
-            await _filesRepository.AddArtwork(artwork);
-            await _filesRepository.SetArtworkToFiles(process, artwork.Id);
+            await _artworksRepository.SaveArtwork(artwork);
+
             return true;
         }
     }
