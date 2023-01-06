@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using praca_inzynierska_backend.Data.DTOs;
 using praca_inzynierska_backend.Data.Entities;
+using praca_inzynierska_backend.Misc;
 using praca_inzynierska_backend.Repositories.AccountRepository;
 using praca_inzynierska_backend.Repositories.ArtworksRepository;
 using praca_inzynierska_backend.Services.CloudflareFileService;
@@ -166,6 +167,34 @@ namespace praca_inzynierska_backend.Services.ArtworksService
                 .ToList();
 
             return artworkDTOs;
+        }
+
+        public async Task<bool> UpdateArtwork(
+            string token,
+            Guid id,
+            UpdateArtworkRequestDTO updateArtworkRequestDTO
+        )
+        {
+            User user = await _accountRepository.GetUserByToken(token);
+
+            Artwork artwork = await _artworksRepository.GetArtworkById(id);
+
+            if (user.Id != artwork.Owner!.Id)
+            {
+                return false;
+            }
+
+            artwork.Title = updateArtworkRequestDTO.Title;
+            artwork.Description = updateArtworkRequestDTO.Description;
+            artwork.ArtType = updateArtworkRequestDTO.ArtType;
+            artwork.Genres = updateArtworkRequestDTO.Genres!
+                .Select(genre => new Genre(genre))
+                .ToList();
+            artwork.Tags = updateArtworkRequestDTO.Tags!.Select(tag => new Tag(tag)).ToList();
+
+            await _artworksRepository.SaveArtwork(artwork);
+
+            return true;
         }
 
         public async Task<bool> UpvoteArtwork(string token, Guid id)

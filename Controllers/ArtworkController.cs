@@ -112,5 +112,25 @@ namespace praca_inzynierska_backend.Controllers
 
             return Ok();
         }
+
+        [Authorize]
+        [HttpPatch("{id}")]
+        public async Task<IActionResult> UpdateArtwork(
+            [FromRoute] Guid id,
+            [FromBody] UpdateArtworkRequestDTO updateArtworkRequestDTO
+        )
+        {
+            HttpContext.Request.Headers.TryGetValue("Authorization", out StringValues values);
+            string token = values[0].Split(' ')[1];
+
+            bool success = await _artworksService.UpdateArtwork(token, id, updateArtworkRequestDTO);
+
+            if (!success)
+            {
+                return Conflict("You are not owner!");
+            }
+
+            return Ok();
+        }
     }
 }

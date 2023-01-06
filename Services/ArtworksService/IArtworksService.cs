@@ -15,5 +15,10 @@ namespace praca_inzynierska_backend.Services.ArtworksService
         Task<bool> DeleteArtwork(string token, Guid id);
         Task<bool> UpvoteArtwork(string token, Guid id);
         Task<bool> DownvoteArtwork(string token, Guid id);
+        Task<bool> UpdateArtwork(
+            string token,
+            Guid id,
+            UpdateArtworkRequestDTO updateArtworkRequestDTO
+        );
     }
 }
