@@ -4,6 +4,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using praca_inzynierska_backend.Data;
 using praca_inzynierska_backend.Data.Entities;
@@ -28,8 +29,10 @@ namespace praca_inzynierska_backend.Repositories.AccountRepository
         public async Task<User> GetUserByToken(string token)
         {
             Guid userId = parseJwtToken(token).Id;
+            User? user = await _context.Users!
+                .AsNoTracking()
+                .FirstOrDefaultAsync(user => user.Id == userId);
 
-            User? user = await _context.Users!.FirstOrDefaultAsync(user => user.Id == userId);
             return user!;
         }
 

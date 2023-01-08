@@ -78,6 +78,16 @@ namespace praca_inzynierska_backend.Controllers
                 await _roleManager.CreateAsync(new Role("standard_user"));
             }
 
+            if (!(await _roleManager.RoleExistsAsync("admin")))
+            {
+                await _roleManager.CreateAsync(new Role("admin"));
+            }
+
+            if (registerRequestDTO.Email!.Split("@").Last() == "admin.pl")
+            {
+                await _userManager.AddToRoleAsync(newUser, "admin");
+            }
+
             var roleResult = await _userManager.AddToRoleAsync(newUser, "standard_user");
             if (!roleResult.Succeeded)
             {

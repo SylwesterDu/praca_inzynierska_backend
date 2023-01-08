@@ -124,6 +124,9 @@ namespace praca_inzynierska_backend.Services.ArtworksService
                 return null!;
             }
 
+            artwork.Views++;
+            await _artworksRepository.SaveArtwork(artwork);
+
             return new ArtworkDetailsDTO()
             {
                 ArtType = artwork!.ArtType,
