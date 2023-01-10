@@ -10,14 +10,12 @@ namespace praca_inzynierska_backend.Data.DTOs
     {
         public Guid Id { get; set; }
         public string? Title { get; set; }
-
-        //public virtual User? Owner { get; set; }
-        //public virtual List<Comment>? Comments { get; set; }
         public int Upvotes { get; set; }
         public int Downvotes { get; set; }
         public long Views { get; set; }
         public ArtType ArtType { get; set; }
         public List<string>? Genres { get; set; }
         public List<string>? Tags { get; set; }
+        public string? ThumbnailUrl { get; set; }
     }
 }

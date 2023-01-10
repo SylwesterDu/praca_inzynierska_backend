@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using praca_inzynierska_backend.Data;
 using praca_inzynierska_backend.Data.DTOs;
 using praca_inzynierska_backend.Data.Entities;
+using praca_inzynierska_backend.Misc;
 
 namespace praca_inzynierska_backend.Repositories.ArtworksRepository
 {
@@ -55,6 +56,7 @@ namespace praca_inzynierska_backend.Repositories.ArtworksRepository
                 .Include(artwork => artwork.Tags)
                 .Include(artwork => artwork.Upvotes)
                 .Include(artwork => artwork.Downvotes)
+                .Include(artwork => artwork.Files)
                 .ToListAsync();
 
             return artworks;
@@ -99,7 +101,7 @@ namespace praca_inzynierska_backend.Repositories.ArtworksRepository
         {
             Artwork? artwork = await _context.Artworks!
                 .Where(artwork => artwork.Id == id)
-                .Include(artwork => artwork.Upvotes) //TODO: downvotes
+                .Include(artwork => artwork.Upvotes)
                 .FirstOrDefaultAsync();
 
             return artwork!;
@@ -182,6 +184,23 @@ namespace praca_inzynierska_backend.Repositories.ArtworksRepository
         public async Task SaveArtwork(Artwork artwork)
         {
             await _context.SaveChangesAsync();
+        }
+
+        public async Task<List<Artwork>> GetPopularArtworks(ArtType artType)
+        {
+            DateTime weekAgo = DateTime.Now.Subtract(TimeSpan.FromDays(7));
+            List<Artwork> popularMusic = await _context.Artworks!
+                .Where(artwork => artwork.ArtType == artType && artwork.CreatedAt > weekAgo)
+                .Include(artwork => artwork.Upvotes)
+                .Include(artwork => artwork.Downvotes)
+                .Include(artwork => artwork.Tags)
+                .Include(artwork => artwork.Genres)
+                .Include(artwork => artwork.Files)
+                .OrderBy(artwork => artwork.Views)
+                .Take(10)
+                .ToListAsync();
+
+            return popularMusic;
         }
     }
 }

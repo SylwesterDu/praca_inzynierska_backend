@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using praca_inzynierska_backend.Data.DTOs;
+using praca_inzynierska_backend.Misc;
 
 namespace praca_inzynierska_backend.Services.ArtworksService
 {
@@ -20,5 +21,6 @@ namespace praca_inzynierska_backend.Services.ArtworksService
             Guid id,
             UpdateArtworkRequestDTO updateArtworkRequestDTO
         );
+        Task<List<ArtworkDTO>> GetPopularArtworks(ArtType artType);
     }
 }

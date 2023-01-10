@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Primitives;
 using praca_inzynierska_backend.Data.DTOs;
+using praca_inzynierska_backend.Misc;
 using praca_inzynierska_backend.Services.ArtworksService;
 
 namespace praca_inzynierska_backend.Controllers
@@ -131,6 +132,31 @@ namespace praca_inzynierska_backend.Controllers
             }
 
             return Ok();
+        }
+
+        [HttpGet("popular-music")]
+        public async Task<IActionResult> GetPopularMusic()
+        {
+            List<ArtworkDTO> artworks = await _artworksService.GetPopularArtworks(ArtType.MUSIC);
+            return Ok(artworks);
+        }
+
+        [HttpGet("popular-photography")]
+        public async Task<IActionResult> GetPopularPhotography()
+        {
+            List<ArtworkDTO> artworks = await _artworksService.GetPopularArtworks(
+                ArtType.PHOTOGRAPHY
+            );
+            return Ok(artworks);
+        }
+
+        [HttpGet("popular-literature")]
+        public async Task<IActionResult> GetPopularLiterature()
+        {
+            List<ArtworkDTO> artworks = await _artworksService.GetPopularArtworks(
+                ArtType.LITERATURE
+            );
+            return Ok(artworks);
         }
     }
 }

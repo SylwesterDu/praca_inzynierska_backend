@@ -149,6 +149,31 @@ namespace praca_inzynierska_backend.Services.ArtworksService
             };
         }
 
+        public async Task<List<ArtworkDTO>> GetPopularArtworks(ArtType artType)
+        {
+            List<Artwork> artworks = await _artworksRepository.GetPopularArtworks(artType);
+
+            return artworks
+                .Select(
+                    artwork =>
+                        new ArtworkDTO
+                        {
+                            ArtType = artwork.ArtType,
+                            Genres = artwork.Genres!.Select(genre => genre.GenreName).ToList()!,
+                            Id = artwork.Id,
+                            Tags = artwork.Tags!.Select(tag => tag.TagName).ToList()!,
+                            Title = artwork.Title,
+                            Views = artwork.Views,
+                            Upvotes = artwork.Upvotes!.Count,
+                            Downvotes = artwork.Downvotes!.Count,
+                            ThumbnailUrl = _cloudflareFileService.GetFileUrl(
+                                artwork.Files!.First().Key!
+                            )
+                        }
+                )
+                .ToList();
+        }
+
         public async Task<List<ArtworkDTO>> GetUserArtworks(Guid id)
         {
             List<Artwork> artworks = await _artworksRepository.GetUserArtworks(id);
@@ -164,7 +189,11 @@ namespace praca_inzynierska_backend.Services.ArtworksService
                             Title = artwork.Title,
                             Views = artwork.Views,
                             Upvotes = artwork.Upvotes!.Count,
-                            Downvotes = artwork.Downvotes!.Count
+                            Downvotes = artwork.Downvotes!.Count,
+                            ThumbnailUrl =
+                                artwork.Files!.Count() > 0
+                                    ? _cloudflareFileService.GetFileUrl(artwork.Files!.First().Key!)
+                                    : ""
                         }
                 )
                 .ToList();

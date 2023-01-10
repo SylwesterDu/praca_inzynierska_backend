@@ -8,5 +8,6 @@ namespace praca_inzynierska_backend.Data.DTOs
     public class UploadProcessDTO
     {
         public Guid Id { get; set; }
+        public Guid ArtworkId { get; set; }
     }
 }

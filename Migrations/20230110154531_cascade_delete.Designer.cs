@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using praca_inzynierska_backend.Data;
@@ -12,9 +13,10 @@ using praca_inzynierska_backend.Misc;
 namespace backend.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230110154531_cascade_delete")]
+    partial class cascade_delete
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -494,8 +496,7 @@ namespace backend.Migrations
                 {
                     b.HasOne("praca_inzynierska_backend.Data.Entities.Artwork", "Artwork")
                         .WithMany("Upvotes")
-                        .HasForeignKey("ArtworkId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .HasForeignKey("ArtworkId");
 
                     b.HasOne("praca_inzynierska_backend.Data.Entities.User", "User")
                         .WithMany("Upvotes")

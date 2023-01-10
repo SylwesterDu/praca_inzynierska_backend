@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using praca_inzynierska_backend.Data.DTOs;
 using praca_inzynierska_backend.Data.Entities;
+using praca_inzynierska_backend.Misc;
 
 namespace praca_inzynierska_backend.Repositories.ArtworksRepository
 {
@@ -27,5 +28,6 @@ namespace praca_inzynierska_backend.Repositories.ArtworksRepository
         Task AddArtwork(Artwork artwork);
         Task SaveFile(Artwork artwork);
         Task SaveArtwork(Artwork artwork);
+        Task<List<Artwork>> GetPopularArtworks(ArtType artType);
     }
 }

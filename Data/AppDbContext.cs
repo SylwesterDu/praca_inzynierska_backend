@@ -45,17 +45,20 @@ namespace praca_inzynierska_backend.Data
             builder
                 .Entity<Upvote>()
                 .HasOne<Artwork>(upvote => upvote.Artwork)
-                .WithMany(artwork => artwork.Upvotes);
+                .WithMany(artwork => artwork.Upvotes)
+                .OnDelete(DeleteBehavior.Cascade);
 
             builder
                 .Entity<Downvote>()
                 .HasOne<User>(downvote => downvote.User)
-                .WithMany(user => user.Downvotes);
+                .WithMany(user => user.Downvotes)
+                .OnDelete(DeleteBehavior.Cascade);
 
             builder
                 .Entity<Downvote>()
                 .HasOne<Artwork>(downvote => downvote.Artwork)
-                .WithMany(artwork => artwork.Downvotes);
+                .WithMany(artwork => artwork.Downvotes)
+                .OnDelete(DeleteBehavior.Cascade);
 
             builder
                 .Entity<Artwork>()
