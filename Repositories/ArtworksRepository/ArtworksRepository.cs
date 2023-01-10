@@ -204,3 +204,5 @@ namespace praca_inzynierska_backend.Repositories.ArtworksRepository
         }
     }
 }
+
+//TODO: infinite loop
