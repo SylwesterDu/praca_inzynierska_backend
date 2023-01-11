@@ -158,5 +158,19 @@ namespace praca_inzynierska_backend.Controllers
             );
             return Ok(artworks);
         }
+
+        [Authorize]
+        [HttpPost("{artworkId}/report")]
+        public async Task<IActionResult> ReportArtwork(
+            [FromRoute] Guid artworkId,
+            [FromBody] ReportRequestDTO reportRequestDTO
+        )
+        {
+            HttpContext.Request.Headers.TryGetValue("Authorization", out StringValues values);
+            string token = values[0].Split(' ')[1];
+
+            await _artworksService.ReportArtwork(token, artworkId, reportRequestDTO);
+            return Ok();
+        }
     }
 }

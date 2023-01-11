@@ -29,5 +29,9 @@ namespace praca_inzynierska_backend.Repositories.ArtworksRepository
         Task SaveFile(Artwork artwork);
         Task SaveArtwork(Artwork artwork);
         Task<List<Artwork>> GetPopularArtworks(ArtType artType);
+        Task<List<Report>> GetReports();
+        Task AddReport(Report report);
+        Task<Report> GetReportById(Guid reportId);
+        Task DeleteReport(Report report);
     }
 }

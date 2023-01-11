@@ -202,7 +202,33 @@ namespace praca_inzynierska_backend.Repositories.ArtworksRepository
 
             return popularMusic;
         }
+
+        public async Task<List<Report>> GetReports()
+        {
+            List<Report> reports = await _context.Reports!
+                .Include(report => report.Artwork)
+                .Include(report => report.ReportedBy)
+                .ToListAsync();
+
+            return reports;
+        }
+
+        public async Task AddReport(Report report)
+        {
+            await _context.Reports!.AddAsync(report);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<Report> GetReportById(Guid reportId)
+        {
+            Report report = await _context.Reports!.FirstAsync(report => report.Id == reportId);
+            return report;
+        }
+
+        public async Task DeleteReport(Report report)
+        {
+            _context.Reports!.Remove(report);
+            await _context.SaveChangesAsync();
+        }
     }
 }
-
-//TODO: infinite loop

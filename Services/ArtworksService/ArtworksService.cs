@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
 using praca_inzynierska_backend.Data.DTOs;
 using praca_inzynierska_backend.Data.Entities;
 using praca_inzynierska_backend.Misc;
@@ -16,16 +17,19 @@ namespace praca_inzynierska_backend.Services.ArtworksService
         private IArtworksRepository _artworksRepository;
         private IAccountRepository _accountRepository;
         private ICloudflareFileService _cloudflareFileService;
+        private UserManager<User> _userManager;
 
         public ArtworksService(
             IArtworksRepository artworksRepository,
             IAccountRepository accountRepository,
-            ICloudflareFileService cloudflareFileService
+            ICloudflareFileService cloudflareFileService,
+            UserManager<User> userManager
         )
         {
             _artworksRepository = artworksRepository;
             _accountRepository = accountRepository;
             _cloudflareFileService = cloudflareFileService;
+            _userManager = userManager;
         }
 
         public async Task AddComment(string token, Guid id, string content)
@@ -53,7 +57,9 @@ namespace praca_inzynierska_backend.Services.ArtworksService
                 return false;
             }
 
-            if (artwork.Owner != user)
+            List<string>? userRoles = await _userManager.GetRolesAsync(user) as List<string>;
+
+            if ((user.Id != artwork.Owner!.Id) && !userRoles!.Contains("admin"))
             {
                 return false;
             }
@@ -61,6 +67,12 @@ namespace praca_inzynierska_backend.Services.ArtworksService
             await _artworksRepository.DeleteArtwork(artwork);
 
             return true;
+        }
+
+        public async Task DeleteReport(Guid reportId)
+        {
+            Report report = await _artworksRepository.GetReportById(reportId);
+            await _artworksRepository.DeleteReport(report);
         }
 
         public async Task<bool> DownvoteArtwork(string token, Guid id)
@@ -174,6 +186,25 @@ namespace praca_inzynierska_backend.Services.ArtworksService
                 .ToList();
         }
 
+        public async Task<List<ReportDTO>> GetReports()
+        {
+            List<Report> reports = await _artworksRepository.GetReports();
+
+            return reports
+                .Select(
+                    report =>
+                        new ReportDTO()
+                        {
+                            ArtworkId = report.Artwork!.Id,
+                            ArtworkTitle = report.Artwork.Title,
+                            CreatedAt = report.CreatedAt,
+                            ReportId = report.Id,
+                            ReportReason = report.ReportReason
+                        }
+                )
+                .ToList();
+        }
+
         public async Task<List<ArtworkDTO>> GetUserArtworks(Guid id)
         {
             List<Artwork> artworks = await _artworksRepository.GetUserArtworks(id);
@@ -201,6 +232,26 @@ namespace praca_inzynierska_backend.Services.ArtworksService
             return artworkDTOs;
         }
 
+        public async Task ReportArtwork(
+            string token,
+            Guid artworkId,
+            ReportRequestDTO reportRequestDTO
+        )
+        {
+            Artwork? artwork = await _artworksRepository.GetArtworkById(artworkId);
+            User? user = await _accountRepository.GetUserByToken(token);
+            Report report = new Report()
+            {
+                Artwork = artwork,
+                CreatedAt = DateTime.Now,
+                Id = Guid.NewGuid(),
+                ReportedBy = user,
+                ReportReason = reportRequestDTO.ReportReason
+            };
+
+            await _artworksRepository.AddReport(report);
+        }
+
         public async Task<bool> UpdateArtwork(
             string token,
             Guid id,
@@ -209,9 +260,11 @@ namespace praca_inzynierska_backend.Services.ArtworksService
         {
             User user = await _accountRepository.GetUserByToken(token);
 
+            List<string>? userRoles = await _userManager.GetRolesAsync(user) as List<string>;
+
             Artwork artwork = await _artworksRepository.GetArtworkById(id);
 
-            if (user.Id != artwork.Owner!.Id)
+            if ((user.Id != artwork.Owner!.Id) && !userRoles!.Contains("admin"))
             {
                 return false;
             }

@@ -27,6 +27,7 @@ namespace praca_inzynierska_backend.Data
         public DbSet<Upvote>? Upvotes { get; set; }
         public DbSet<Downvote>? Downvotes { get; set; }
         public DbSet<ArtworkFile>? Files { get; set; }
+        public DbSet<Report>? Reports { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -76,6 +77,10 @@ namespace praca_inzynierska_backend.Data
                 .Entity<Artwork>()
                 .HasMany(artwork => artwork.Files)
                 .WithOne(file => file.Artwork);
+
+            builder.Entity<Report>().HasOne(report => report.Artwork);
+
+            builder.Entity<Report>().HasOne(report => report.ReportedBy);
 
             base.OnModelCreating(builder);
         }

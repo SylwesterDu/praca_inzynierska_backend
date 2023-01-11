@@ -22,5 +22,8 @@ namespace praca_inzynierska_backend.Services.ArtworksService
             UpdateArtworkRequestDTO updateArtworkRequestDTO
         );
         Task<List<ArtworkDTO>> GetPopularArtworks(ArtType artType);
+        Task<List<ReportDTO>> GetReports();
+        Task ReportArtwork(string token, Guid artworkId, ReportRequestDTO reportRequestDTO);
+        Task DeleteReport(Guid reportId);
     }
 }
