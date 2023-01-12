@@ -172,5 +172,23 @@ namespace praca_inzynierska_backend.Controllers
             await _artworksService.ReportArtwork(token, artworkId, reportRequestDTO);
             return Ok();
         }
+
+        [HttpGet]
+        public async Task<IActionResult> Search(
+            string? query,
+            ArtType? artType,
+            string? genre,
+            string? tags
+        )
+        {
+            List<ArtworkDTO> artworks = await _artworksService.SearchArtworks(
+                query,
+                artType,
+                genre,
+                tags
+            );
+
+            return Ok(artworks);
+        }
     }
 }

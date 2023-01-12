@@ -33,5 +33,11 @@ namespace praca_inzynierska_backend.Repositories.ArtworksRepository
         Task AddReport(Report report);
         Task<Report> GetReportById(Guid reportId);
         Task DeleteReport(Report report);
+        Task<List<Artwork>> SearchArtworks(
+            string query,
+            List<ArtType?> artTypes,
+            string genre,
+            List<string> tagsList
+        );
     }
 }

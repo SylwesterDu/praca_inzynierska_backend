@@ -252,6 +252,59 @@ namespace praca_inzynierska_backend.Services.ArtworksService
             await _artworksRepository.AddReport(report);
         }
 
+        public async Task<List<ArtworkDTO>> SearchArtworks(
+            string? query,
+            ArtType? artType,
+            string? genre,
+            string? tags
+        )
+        {
+            List<string> tagsList = new List<string>();
+            if (tags is not null)
+            {
+                tagsList = tags.Split(",").ToList();
+            }
+            List<ArtType?> artTypes = new List<ArtType?>();
+            if (artType is not null)
+            {
+                artTypes.Add(artType!);
+            }
+            else
+            {
+                artTypes.Add(ArtType.MUSIC);
+                artTypes.Add(ArtType.LITERATURE);
+                artTypes.Add(ArtType.PHOTOGRAPHY);
+                artTypes.Add(ArtType.OTHER);
+            }
+            List<Artwork> artworks = await _artworksRepository.SearchArtworks(
+                query ?? "",
+                artTypes,
+                genre ?? "",
+                tagsList
+            );
+
+            return artworks
+                .Select(
+                    artwork =>
+                        new ArtworkDTO()
+                        {
+                            ArtType = artwork.ArtType,
+                            Genres = artwork.Genres!.Select(genre => genre.GenreName).ToList()!,
+                            Id = artwork.Id,
+                            Tags = artwork.Tags!.Select(tag => tag.TagName).ToList()!,
+                            Title = artwork.Title,
+                            Views = artwork.Views,
+                            Upvotes = artwork.Upvotes!.Count,
+                            Downvotes = artwork.Downvotes!.Count,
+                            ThumbnailUrl =
+                                artwork.Files!.Count() > 0
+                                    ? _cloudflareFileService.GetFileUrl(artwork.Files!.First().Key!)
+                                    : ""
+                        }
+                )
+                .ToList();
+        }
+
         public async Task<bool> UpdateArtwork(
             string token,
             Guid id,

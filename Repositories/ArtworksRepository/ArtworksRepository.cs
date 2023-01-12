@@ -230,5 +230,61 @@ namespace praca_inzynierska_backend.Repositories.ArtworksRepository
             _context.Reports!.Remove(report);
             await _context.SaveChangesAsync();
         }
+
+        public async Task<List<Artwork>> SearchArtworks(
+            string query,
+            List<ArtType?> artTypes,
+            string genre,
+            List<string> tagsList
+        )
+        {
+            List<Artwork> artworks;
+
+            if (tagsList.Count() == 0)
+            {
+                artworks = await _context.Artworks!
+                    .Include(artwork => artwork.Upvotes)
+                    .Include(artwork => artwork.Downvotes)
+                    .Include(artwork => artwork.Tags)
+                    .Include(artwork => artwork.Genres)
+                    .Include(artwork => artwork.Files)
+                    .OrderBy(artwork => artwork.Views)
+                    .Where(
+                        artwork =>
+                            artwork.Title!.ToUpper().Contains(query!.ToUpper())
+                            && artTypes.Contains((artwork.ArtType))
+                            && artwork.Genres!.Any(
+                                artworkGenre =>
+                                    artworkGenre.GenreName!.ToUpper().Contains(genre.ToUpper())
+                            )
+                    )
+                    .ToListAsync();
+            }
+            else
+            {
+                artworks = await _context.Artworks!
+                    .Include(artwork => artwork.Upvotes)
+                    .Include(artwork => artwork.Downvotes)
+                    .Include(artwork => artwork.Tags)
+                    .Include(artwork => artwork.Genres)
+                    .Include(artwork => artwork.Files)
+                    .OrderBy(artwork => artwork.Views)
+                    .Where(
+                        artwork =>
+                            artwork.Title!.ToUpper().Contains(query!.ToUpper())
+                            && artTypes.Contains((artwork.ArtType))
+                            && artwork.Genres!.Any(
+                                artworkGenre =>
+                                    artworkGenre.GenreName!.ToUpper().Contains(genre.ToUpper())
+                            )
+                            && artwork.Tags!.Any(
+                                artworkTag => tagsList.Any(tag => tag == artworkTag.TagName)
+                            )
+                    )
+                    .ToListAsync();
+            }
+
+            return artworks;
+        }
     }
 }

@@ -25,5 +25,11 @@ namespace praca_inzynierska_backend.Services.ArtworksService
         Task<List<ReportDTO>> GetReports();
         Task ReportArtwork(string token, Guid artworkId, ReportRequestDTO reportRequestDTO);
         Task DeleteReport(Guid reportId);
+        Task<List<ArtworkDTO>> SearchArtworks(
+            string? query,
+            ArtType? artType,
+            string? genre,
+            string? tags
+        );
     }
 }
