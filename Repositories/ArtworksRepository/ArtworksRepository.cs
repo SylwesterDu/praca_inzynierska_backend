@@ -286,5 +286,67 @@ namespace praca_inzynierska_backend.Repositories.ArtworksRepository
 
             return artworks;
         }
+
+        public async Task<List<StatsPerArtworkTypeDTO>> GetArtworksCountByArtType(User user)
+        {
+            List<StatsPerArtworkTypeDTO> stats = await _context.Artworks!
+                .Where(artwork => artwork.Owner!.Id == user.Id && artwork.Published)
+                .GroupBy(q => q.ArtType)
+                .Select(
+                    result =>
+                        new StatsPerArtworkTypeDTO()
+                        {
+                            ArtType = result.Key,
+                            Count = result.Count()
+                        }
+                )
+                .ToListAsync();
+            return stats;
+        }
+
+        public async Task<List<StatsPerArtworkTypeDTO>> GetArtworksViewsByArtType(User user)
+        {
+            List<StatsPerArtworkTypeDTO> stats = await _context.Artworks!
+                .Where(artwork => artwork.Owner!.Id == user.Id && artwork.Published)
+                .GroupBy(q => q.ArtType)
+                .Select(
+                    result =>
+                        new StatsPerArtworkTypeDTO()
+                        {
+                            ArtType = result.Key,
+                            Count = result.Sum(artwork => artwork.Views)
+                        }
+                )
+                .ToListAsync();
+            return stats;
+        }
+
+        public async Task<List<StatsPerArtworkTypeDTO>> GetArtworksCommentsCountByArtType(User user)
+        {
+            List<StatsPerArtworkTypeDTO> stats = await _context.Artworks!
+                .Where(artwork => artwork.Owner!.Id == user.Id && artwork.Published)
+                .GroupBy(q => q.ArtType)
+                .Select(
+                    result =>
+                        new StatsPerArtworkTypeDTO()
+                        {
+                            ArtType = result.Key,
+                            Count = result.Sum(artwork => artwork.Comments!.Count())
+                        }
+                )
+                .ToListAsync();
+            return stats;
+        }
+
+        public async Task<VotesCountDTO> GetArtworksVotes(User user)
+        {
+            int upvotes = await _context.Upvotes!.CountAsync(
+                upvote => upvote.Artwork!.Owner!.Id == user.Id
+            );
+            int downvotes = await _context.Downvotes!.CountAsync(
+                upvote => upvote.Artwork!.Owner!.Id == user.Id
+            );
+            return new VotesCountDTO() { Upvotes = upvotes, Downvotes = downvotes };
+        }
     }
 }

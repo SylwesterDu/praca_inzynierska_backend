@@ -28,6 +28,7 @@ namespace praca_inzynierska_backend.Data
         public DbSet<Downvote>? Downvotes { get; set; }
         public DbSet<ArtworkFile>? Files { get; set; }
         public DbSet<Report>? Reports { get; set; }
+        public DbSet<AvatarFile>? AvatarFiles { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -81,6 +82,8 @@ namespace praca_inzynierska_backend.Data
             builder.Entity<Report>().HasOne(report => report.Artwork);
 
             builder.Entity<Report>().HasOne(report => report.ReportedBy);
+
+            builder.Entity<User>().HasOne(user => user.Avatar).WithOne(avatar => avatar.user);
 
             base.OnModelCreating(builder);
         }

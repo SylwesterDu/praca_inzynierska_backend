@@ -21,7 +21,11 @@ namespace praca_inzynierska_backend.Controllers
         private UserManager<User> _userManager;
         private IAccountService _accountService;
 
-        public UserController(IArtworksService artworksService, UserManager<User> userManager, IAccountService accountService)
+        public UserController(
+            IArtworksService artworksService,
+            UserManager<User> userManager,
+            IAccountService accountService
+        )
         {
             _artworksService = artworksService;
             _userManager = userManager;
@@ -65,5 +69,35 @@ namespace praca_inzynierska_backend.Controllers
             return Ok(userDTO);
         }
 
+        [HttpGet("{userId}")]
+        public async Task<IActionResult> GetUserDetails(Guid userId)
+        {
+            UserDetailsDTO userDTO = await _accountService.GetUserDetails(userId);
+
+            return Ok(userDTO);
+        }
+
+        [Authorize]
+        [HttpGet("stats")]
+        public async Task<IActionResult> GetStats()
+        {
+            HttpContext.Request.Headers.TryGetValue("Authorization", out StringValues values);
+            string token = values[0].Split(' ')[1];
+
+            StatsDTO stats = await _artworksService.GetUserStats(token);
+
+            return Ok(stats);
+        }
+
+        [Authorize]
+        [HttpPost("change-avatar")]
+        public async Task<IActionResult> ChangeAvatar([FromForm] IFormFile file)
+        {
+            HttpContext.Request.Headers.TryGetValue("Authorization", out StringValues values);
+            string token = values[0].Split(' ')[1];
+            await _accountService.ChangeAvatar(token, file);
+
+            return Ok();
+        }
     }
 }

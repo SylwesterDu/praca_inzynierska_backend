@@ -17,5 +17,6 @@ namespace praca_inzynierska_backend.Data.Entities
         public List<Upvote>? Upvotes { get; set; }
         public List<Downvote>? Downvotes { get; set; }
         public List<Comment>? Comments { get; set; }
+        public AvatarFile? Avatar { get; set; }
     }
 }

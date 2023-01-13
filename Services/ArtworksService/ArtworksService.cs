@@ -232,6 +232,30 @@ namespace praca_inzynierska_backend.Services.ArtworksService
             return artworkDTOs;
         }
 
+        public async Task<StatsDTO> GetUserStats(string token)
+        {
+            User? user = await _accountRepository.GetUserByToken(token);
+
+            List<StatsPerArtworkTypeDTO> artworksCountByArtType =
+                await _artworksRepository.GetArtworksCountByArtType(user);
+
+            List<StatsPerArtworkTypeDTO> artworksViewsByArtType =
+                await _artworksRepository.GetArtworksViewsByArtType(user);
+
+            List<StatsPerArtworkTypeDTO> artworksCommentsCountByArtType =
+                await _artworksRepository.GetArtworksCommentsCountByArtType(user);
+
+            VotesCountDTO votesCount = await _artworksRepository.GetArtworksVotes(user);
+
+            return new StatsDTO()
+            {
+                ArtworksCount = artworksCountByArtType,
+                ArtworksCommentsCount = artworksCommentsCountByArtType,
+                ArtworksViewsCount = artworksViewsByArtType,
+                Votes = votesCount
+            };
+        }
+
         public async Task ReportArtwork(
             string token,
             Guid artworkId,

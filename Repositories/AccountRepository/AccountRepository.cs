@@ -20,16 +20,26 @@ namespace praca_inzynierska_backend.Repositories.AccountRepository
             _context = appDbContext;
         }
 
+        public async Task AddAvatar(AvatarFile avatarFile)
+        {
+            await _context.AvatarFiles!.AddAsync(avatarFile);
+            await _context.SaveChangesAsync();
+        }
+
         public async Task<User> GetUserById(Guid id)
         {
-            User? user = await _context.Users!.FirstOrDefaultAsync(user => user.Id == id);
+            User? user = await _context.Users!
+                .Include(user => user.Avatar)
+                .FirstOrDefaultAsync(user => user.Id == id);
             return user!;
         }
 
         public async Task<User> GetUserByToken(string token)
         {
             Guid userId = parseJwtToken(token).Id;
-            User? user = await _context.Users!.FirstOrDefaultAsync(user => user.Id == userId);
+            User? user = await _context.Users!
+                .Include(user => user.Avatar)
+                .FirstOrDefaultAsync(user => user.Id == userId);
 
             return user!;
         }
@@ -58,6 +68,11 @@ namespace praca_inzynierska_backend.Repositories.AccountRepository
                 .FirstOrDefaultAsync();
 
             return user!;
+        }
+
+        public async Task SaveChanges(User user)
+        {
+            await _context.SaveChangesAsync();
         }
 
         private ParsedJwtToken parseJwtToken(string token)

@@ -5,11 +5,11 @@ using System.Threading.Tasks;
 
 namespace praca_inzynierska_backend.Data.DTOs
 {
-    public class UserDTO
+    public record UserDetailsDTO
     {
-        public string? Username { get; set; }
-        public string[]? Roles { get; set; }
         public Guid Id { get; set; }
+        public string? Username { get; set; }
+        public List<StatsPerArtworkTypeDTO>? Stats { get; set; }
         public string? Avatar { get; set; }
     }
 }

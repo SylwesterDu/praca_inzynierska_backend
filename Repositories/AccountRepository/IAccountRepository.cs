@@ -13,5 +13,7 @@ namespace praca_inzynierska_backend.Repositories.AccountRepository
         Task<User> GetUserById(Guid id);
         Task<User> GetUserWithArtworksById(Guid id);
         Task<User> GetUserWithUpvotesById(Guid id);
+        Task SaveChanges(User user);
+        Task AddAvatar(AvatarFile avatarFile);
     }
 }

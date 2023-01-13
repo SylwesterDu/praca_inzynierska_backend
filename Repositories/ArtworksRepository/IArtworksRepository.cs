@@ -39,5 +39,9 @@ namespace praca_inzynierska_backend.Repositories.ArtworksRepository
             string genre,
             List<string> tagsList
         );
+        Task<List<StatsPerArtworkTypeDTO>> GetArtworksCountByArtType(User user);
+        Task<List<StatsPerArtworkTypeDTO>> GetArtworksViewsByArtType(User user);
+        Task<List<StatsPerArtworkTypeDTO>> GetArtworksCommentsCountByArtType(User user);
+        Task<VotesCountDTO> GetArtworksVotes(User user);
     }
 }

@@ -43,6 +43,42 @@ namespace praca_inzynierska_backend.Services.CloudflareFileService
             return url;
         }
 
+        public async Task<string> UploadAvatar(Guid id, IFormFile file)
+        {
+            string key = id.ToString() + "_" + file.FileName + Guid.NewGuid();
+
+            try
+            {
+                PutObjectRequest putRequest = new PutObjectRequest
+                {
+                    BucketName = _configuration["R2:BucketName"],
+                    Key = key,
+                    InputStream = file.OpenReadStream(),
+                    ContentType = file.ContentType,
+                    DisablePayloadSigning = true,
+                };
+                PutObjectResponse response = await _client.PutObjectAsync(putRequest);
+                return key;
+            }
+            catch (AmazonS3Exception amazonS3Exception)
+            {
+                if (
+                    amazonS3Exception.ErrorCode != null
+                    && (
+                        amazonS3Exception.ErrorCode.Equals("InvalidAccessKeyId")
+                        || amazonS3Exception.ErrorCode.Equals("InvalidSecurity")
+                    )
+                )
+                {
+                    throw new Exception("Check the provided AWS Credentials.");
+                }
+                else
+                {
+                    throw new Exception("Error occurred: " + amazonS3Exception.Message);
+                }
+            }
+        }
+
         public async Task<string> UploadFile(Guid artworkId, IFormFile file)
         {
             string key = artworkId.ToString() + "_" + file.FileName;
