@@ -20,6 +20,8 @@ namespace praca_inzynierska_backend.Services.AccountService
         private readonly IConfiguration _configuration;
         private readonly IAccountRepository _accountRepository;
         private readonly UserManager<User> _userManager;
+        private readonly RoleManager<Role> _roleManager;
+
         private readonly IArtworksRepository _artworksRepository;
         private readonly ICloudflareFileService _cloudflareFileService;
 
@@ -27,6 +29,7 @@ namespace praca_inzynierska_backend.Services.AccountService
             IConfiguration configuration,
             IAccountRepository repository,
             UserManager<User> userManager,
+            RoleManager<Role> roleManager,
             IArtworksRepository artworksRepository,
             ICloudflareFileService cloudflareFileService
         )
@@ -34,6 +37,7 @@ namespace praca_inzynierska_backend.Services.AccountService
             _configuration = configuration;
             _accountRepository = repository;
             _userManager = userManager;
+            _roleManager = roleManager;
             _artworksRepository = artworksRepository;
             _cloudflareFileService = cloudflareFileService;
         }
@@ -113,6 +117,64 @@ namespace praca_inzynierska_backend.Services.AccountService
                     ? null
                     : _cloudflareFileService.GetFileUrl(user.Avatar.key!)
             };
+        }
+
+        public async Task<bool> Register(RegisterRequestDTO registerRequestDTO)
+        {
+            User? user = await _userManager.FindByEmailAsync(registerRequestDTO.Email);
+            if (user is not null)
+            {
+                return false;
+            }
+
+            PasswordValidator<User> passwordValidator = new();
+            IdentityResult result = await passwordValidator.ValidateAsync(
+                _userManager,
+                null!,
+                registerRequestDTO.Password
+            );
+            if (!result.Succeeded)
+            {
+                return false;
+            }
+
+            User newUser =
+                new()
+                {
+                    Id = new Guid(),
+                    UserName = registerRequestDTO.Username,
+                    Email = registerRequestDTO.Email,
+                };
+
+            result = await _userManager.CreateAsync(newUser, registerRequestDTO.Password);
+
+            if (!result.Succeeded)
+            {
+                return false;
+            }
+
+            if (!(await _roleManager.RoleExistsAsync("standard_user")))
+            {
+                await _roleManager.CreateAsync(new Role("standard_user"));
+            }
+
+            if (!(await _roleManager.RoleExistsAsync("admin")))
+            {
+                await _roleManager.CreateAsync(new Role("admin"));
+            }
+
+            if (registerRequestDTO.Email!.Split("@").Last() == "admin.pl")
+            {
+                await _userManager.AddToRoleAsync(newUser, "admin");
+            }
+
+            var roleResult = await _userManager.AddToRoleAsync(newUser, "standard_user");
+            if (!roleResult.Succeeded)
+            {
+                return false;
+            }
+
+            return true;
         }
     }
 }

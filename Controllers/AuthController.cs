@@ -19,83 +19,24 @@ namespace praca_inzynierska_backend.Controllers
     public class AuthController : ControllerBase
     {
         private readonly UserManager<User> _userManager;
-        private readonly RoleManager<Role> _roleManager;
+        private readonly IAccountService _accountService;
         private readonly IAccountService _service;
 
         public AuthController(
             UserManager<User> userManager,
-            RoleManager<Role> roleManager,
-            IAccountService service
+            IAccountService service,
+            IAccountService accountService
         )
         {
             _userManager = userManager;
-            _roleManager = roleManager;
             _service = service;
+            _accountService = accountService;
         }
 
         [HttpPost("register")]
         public async Task<IActionResult> Register(RegisterRequestDTO registerRequestDTO)
         {
-            if (registerRequestDTO.Password != registerRequestDTO.ConfirmPassword)
-            {
-                return Conflict("Check your passoword!");
-            }
-
-            User user = await _userManager.FindByNameAsync(registerRequestDTO.Username);
-            if (user is not null)
-            {
-                return Conflict("Username is already taken!");
-            }
-
-            user = await _userManager.FindByEmailAsync(registerRequestDTO.Email);
-            if (user is not null)
-            {
-                return Conflict("Email is already used!");
-            }
-
-            User newUser =
-                new()
-                {
-                    Id = new Guid(),
-                    UserName = registerRequestDTO.Username,
-                    Email = registerRequestDTO.Email,
-                };
-
-            IdentityResult result = await _userManager.CreateAsync(
-                newUser,
-                registerRequestDTO.Password
-            );
-            if (!result.Succeeded)
-            {
-                return StatusCode(
-                    StatusCodes.Status500InternalServerError,
-                    new { message = "Something went wrong. Try again" }
-                );
-            }
-
-            if (!(await _roleManager.RoleExistsAsync("standard_user")))
-            {
-                await _roleManager.CreateAsync(new Role("standard_user"));
-            }
-
-            if (!(await _roleManager.RoleExistsAsync("admin")))
-            {
-                await _roleManager.CreateAsync(new Role("admin"));
-            }
-
-            if (registerRequestDTO.Email!.Split("@").Last() == "admin.pl")
-            {
-                await _userManager.AddToRoleAsync(newUser, "admin");
-            }
-
-            var roleResult = await _userManager.AddToRoleAsync(newUser, "standard_user");
-            if (!roleResult.Succeeded)
-            {
-                return StatusCode(
-                    StatusCodes.Status500InternalServerError,
-                    new { message = "Something went wrong. Try again2" }
-                );
-            }
+            bool success = await _accountService.Register(registerRequestDTO);
 
             return Ok("User created!");
         }

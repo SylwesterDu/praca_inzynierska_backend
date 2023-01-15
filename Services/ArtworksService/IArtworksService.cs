@@ -32,5 +32,6 @@ namespace praca_inzynierska_backend.Services.ArtworksService
             string? tags
         );
         Task<StatsDTO> GetUserStats(string token);
+        Task<StatsDTO> GetUserStats(Guid userId);
     }
 }

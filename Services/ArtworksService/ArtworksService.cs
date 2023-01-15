@@ -178,9 +178,10 @@ namespace praca_inzynierska_backend.Services.ArtworksService
                             Views = artwork.Views,
                             Upvotes = artwork.Upvotes!.Count,
                             Downvotes = artwork.Downvotes!.Count,
-                            ThumbnailUrl = _cloudflareFileService.GetFileUrl(
-                                artwork.Files!.First().Key!
-                            )
+                            ThumbnailUrl =
+                                artwork.Files!.Count == 0
+                                    ? ""
+                                    : _cloudflareFileService.GetFileUrl(artwork.Files!.First().Key!)
                         }
                 )
                 .ToList();
@@ -235,6 +236,30 @@ namespace praca_inzynierska_backend.Services.ArtworksService
         public async Task<StatsDTO> GetUserStats(string token)
         {
             User? user = await _accountRepository.GetUserByToken(token);
+
+            List<StatsPerArtworkTypeDTO> artworksCountByArtType =
+                await _artworksRepository.GetArtworksCountByArtType(user);
+
+            List<StatsPerArtworkTypeDTO> artworksViewsByArtType =
+                await _artworksRepository.GetArtworksViewsByArtType(user);
+
+            List<StatsPerArtworkTypeDTO> artworksCommentsCountByArtType =
+                await _artworksRepository.GetArtworksCommentsCountByArtType(user);
+
+            VotesCountDTO votesCount = await _artworksRepository.GetArtworksVotes(user);
+
+            return new StatsDTO()
+            {
+                ArtworksCount = artworksCountByArtType,
+                ArtworksCommentsCount = artworksCommentsCountByArtType,
+                ArtworksViewsCount = artworksViewsByArtType,
+                Votes = votesCount
+            };
+        }
+
+        public async Task<StatsDTO> GetUserStats(Guid userId)
+        {
+            User? user = await _accountRepository.GetUserById(userId);
 
             List<StatsPerArtworkTypeDTO> artworksCountByArtType =
                 await _artworksRepository.GetArtworksCountByArtType(user);

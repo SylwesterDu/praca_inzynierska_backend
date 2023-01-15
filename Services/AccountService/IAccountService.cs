@@ -16,5 +16,6 @@ namespace praca_inzynierska_backend.Services.AccountService
         public Task<User> GetUserByToken(string token);
         Task<UserDetailsDTO> GetUserDetails(Guid userId);
         Task<UserDTO> GetUserInfo(string token);
+        Task<bool> Register(RegisterRequestDTO registerRequestDTO);
     }
 }
