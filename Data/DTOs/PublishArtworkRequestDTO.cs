@@ -13,5 +13,6 @@ namespace praca_inzynierska_backend.Data.DTOs
         public ArtType ArtType { get; init; }
         public List<string>? Tags { get; init; }
         public List<string>? Genres { get; init; }
+        public bool AdultContent { get; set; }
     }
 }

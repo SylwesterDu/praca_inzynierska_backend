@@ -73,7 +73,7 @@ namespace praca_inzynierska_backend.UnitTests
                 null
             );
 
-            ArtworkDetailsDTO dto = await artworksService.GetArtworkDetails(artworkId);
+            ArtworkDetailsDTO dto = await artworksService.GetArtworkDetails(artworkId, "");
 
             Assert.Equal(dto.Owner!.Id, userId);
         }

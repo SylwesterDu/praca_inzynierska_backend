@@ -12,5 +12,6 @@ namespace praca_inzynierska_backend.Data.Entities
         public User? Creator { get; set; }
         public string? Content { get; set; }
         public DateTime CreatedAt { get; init; }
+        public int? rating { get; set; }
     }
 }

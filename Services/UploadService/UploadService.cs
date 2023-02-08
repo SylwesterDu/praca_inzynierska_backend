@@ -51,7 +51,7 @@ namespace praca_inzynierska_backend.Services.UploadService
         public async Task<bool> UploadFile(string token, IFormFile formFile, Guid id)
         {
             User user = await _accountService.GetUserByToken(token);
-            Artwork artwork = await _artworksRepository.GetArtworkById(id);
+            Artwork artwork = await _artworksRepository.GetArtworkById(id)!;
 
             string key = await _cloudflareFileService.UploadFile(id, formFile);
 
@@ -77,7 +77,7 @@ namespace praca_inzynierska_backend.Services.UploadService
         {
             User user = await _accountService.GetUserByToken(token);
 
-            Artwork artwork = await _artworksRepository.GetArtworkById(id);
+            Artwork artwork = await _artworksRepository.GetArtworkById(id)!;
 
             artwork.ArtType = publishArtworkRequestDTO.ArtType;
             artwork.Comments = new List<Comment>();
@@ -91,6 +91,7 @@ namespace praca_inzynierska_backend.Services.UploadService
                 .Select(tag => new Tag(tag) { Id = new Guid() })
                 .ToList();
             artwork.Published = true;
+            artwork.AdultContent = publishArtworkRequestDTO.AdultContent;
 
             await _artworksRepository.SaveArtwork(artwork);
 

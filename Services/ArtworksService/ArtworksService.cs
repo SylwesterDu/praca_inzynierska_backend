@@ -32,15 +32,16 @@ namespace praca_inzynierska_backend.Services.ArtworksService
             _userManager = userManager;
         }
 
-        public async Task AddComment(string token, Guid id, string content)
+        public async Task AddComment(string token, Guid id, AddCommentDTO dto)
         {
             User user = await _accountRepository.GetUserByToken(token);
-            Artwork artwork = await _artworksRepository.GetArtworkById(id);
+            Artwork? artwork = await _artworksRepository.GetArtworkById(id)!;
             Comment comment = new Comment()
             {
                 Artwork = artwork,
-                Content = content,
+                Content = dto.content,
                 CreatedAt = DateTime.Now,
+                rating = dto.rating,
                 Creator = user
             };
 
@@ -105,7 +106,7 @@ namespace praca_inzynierska_backend.Services.ArtworksService
             return success;
         }
 
-        public async Task<IEnumerable<CommentDTO>> GetArtworkComments(Guid id)
+        public async Task<List<CommentDTO>> GetArtworkComments(Guid id)
         {
             IEnumerable<Comment> comments = await _artworksRepository.GetArtworkComments(id);
 
@@ -114,21 +115,37 @@ namespace praca_inzynierska_backend.Services.ArtworksService
                 return null!;
             }
 
-            return comments.Select(
-                comment =>
-                    new CommentDTO()
-                    {
-                        Content = comment.Content,
-                        CreatedAt = comment.CreatedAt,
-                        CreatorId = comment.Creator!.Id,
-                        CreatorName = comment.Creator.UserName
-                    }
-            );
+            return comments
+                .Select(
+                    comment =>
+                        new CommentDTO()
+                        {
+                            Content = comment.Content,
+                            CreatedAt = comment.CreatedAt,
+                            CreatorId = comment.Creator!.Id,
+                            CreatorName = comment.Creator.UserName,
+                            rating = comment.rating
+                        }
+                )
+                .ToList();
         }
 
-        public async Task<ArtworkDetailsDTO> GetArtworkDetails(Guid id)
+        public async Task<ArtworkDetailsDTO> GetArtworkDetails(Guid id, string token)
         {
-            Artwork? artwork = await _artworksRepository.GetArtworkById(id);
+            User user = await _accountRepository.GetUserByToken(token);
+            Artwork? artwork = await _artworksRepository.GetArtworkById(id)!;
+            if (artwork.AdultContent)
+            {
+                if (user is null)
+                {
+                    return null!;
+                }
+                TimeSpan yearOld = DateTime.Now - user.BirthDate.AddYears(18);
+                if (yearOld.Days < 0)
+                {
+                    return null!;
+                }
+            }
             int upvotesCount = await _artworksRepository.GetArtworkUpvotesCount(id);
             int downvotesCount = await _artworksRepository.GetArtworkDownvotesCount(id);
             if (artwork is null)
@@ -287,7 +304,7 @@ namespace praca_inzynierska_backend.Services.ArtworksService
             ReportRequestDTO reportRequestDTO
         )
         {
-            Artwork? artwork = await _artworksRepository.GetArtworkById(artworkId);
+            Artwork? artwork = await _artworksRepository.GetArtworkById(artworkId)!;
             User? user = await _accountRepository.GetUserByToken(token);
             Report report = new Report()
             {

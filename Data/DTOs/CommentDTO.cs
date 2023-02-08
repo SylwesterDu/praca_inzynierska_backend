@@ -11,5 +11,6 @@ namespace praca_inzynierska_backend.Data.DTOs
         public DateTime CreatedAt { get; set; }
         public string? CreatorName { get; set; }
         public Guid CreatorId { get; set; }
+        public int? rating { get; set; }
     }
 }

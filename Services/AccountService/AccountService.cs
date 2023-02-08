@@ -144,6 +144,7 @@ namespace praca_inzynierska_backend.Services.AccountService
                     Id = new Guid(),
                     UserName = registerRequestDTO.Username,
                     Email = registerRequestDTO.Email,
+                    BirthDate = registerRequestDTO.BirthDate
                 };
 
             result = await _userManager.CreateAsync(newUser, registerRequestDTO.Password);

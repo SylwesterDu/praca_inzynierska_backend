@@ -24,5 +24,6 @@ namespace praca_inzynierska_backend.Data.Entities
         public List<Tag>? Tags { get; set; }
         public List<ArtworkFile>? Files { get; set; }
         public bool Published { get; set; }
+        public bool AdultContent { get; set; }
     }
 }

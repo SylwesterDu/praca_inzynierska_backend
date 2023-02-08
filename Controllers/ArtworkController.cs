@@ -25,7 +25,10 @@ namespace praca_inzynierska_backend.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetArtworkDetails(Guid id)
         {
-            ArtworkDetailsDTO dto = await _artworksService.GetArtworkDetails(id);
+            HttpContext.Request.Headers.TryGetValue("Authorization", out StringValues values);
+            string? token = values[0].Split(' ')[1];
+
+            ArtworkDetailsDTO dto = await _artworksService.GetArtworkDetails(id, token);
             if (dto is null)
             {
                 return NotFound("Artwork with given id does not exists!");
@@ -36,7 +39,7 @@ namespace praca_inzynierska_backend.Controllers
         [HttpGet("{id}/comments")]
         public async Task<IActionResult> GetArtworkComments(Guid id)
         {
-            IEnumerable<CommentDTO> dto = await _artworksService.GetArtworkComments(id);
+            List<CommentDTO> dto = await _artworksService.GetArtworkComments(id);
             if (dto is null)
             {
                 return NotFound("Artwork with given id does not exists!");
@@ -58,7 +61,7 @@ namespace praca_inzynierska_backend.Controllers
             {
                 return BadRequest("Comment is too short!");
             }
-            await _artworksService.AddComment(token, id, dto.content!);
+            await _artworksService.AddComment(token, id, dto);
 
             return Ok();
         }
