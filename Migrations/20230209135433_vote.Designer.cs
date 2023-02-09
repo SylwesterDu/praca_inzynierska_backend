@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using praca_inzynierska_backend.Data;
@@ -12,9 +13,10 @@ using praca_inzynierska_backend.Misc;
 namespace backend.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230209135433_vote")]
+    partial class vote
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -206,6 +208,36 @@ namespace backend.Migrations
                     b.ToTable("AvatarFiles");
                 });
 
+            modelBuilder.Entity("praca_inzynierska_backend.Data.Entities.Comment", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("ArtworkId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Content")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("CreatorId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int?>("rating")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ArtworkId");
+
+                    b.HasIndex("CreatorId");
+
+                    b.ToTable("Comments");
+                });
+
             modelBuilder.Entity("praca_inzynierska_backend.Data.Entities.Report", b =>
                 {
                     b.Property<Guid>("Id")
@@ -231,36 +263,6 @@ namespace backend.Migrations
                     b.HasIndex("ReportedById");
 
                     b.ToTable("Reports");
-                });
-
-            modelBuilder.Entity("praca_inzynierska_backend.Data.Entities.Review", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid?>("ArtworkId")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Content")
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<Guid?>("CreatorId")
-                        .HasColumnType("uuid");
-
-                    b.Property<int?>("Rating")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ArtworkId");
-
-                    b.HasIndex("CreatorId");
-
-                    b.ToTable("Reviews");
                 });
 
             modelBuilder.Entity("praca_inzynierska_backend.Data.Entities.Role", b =>
@@ -503,6 +505,22 @@ namespace backend.Migrations
                     b.Navigation("user");
                 });
 
+            modelBuilder.Entity("praca_inzynierska_backend.Data.Entities.Comment", b =>
+                {
+                    b.HasOne("praca_inzynierska_backend.Data.Entities.Artwork", "Artwork")
+                        .WithMany("Comments")
+                        .HasForeignKey("ArtworkId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("praca_inzynierska_backend.Data.Entities.User", "Creator")
+                        .WithMany("Comments")
+                        .HasForeignKey("CreatorId");
+
+                    b.Navigation("Artwork");
+
+                    b.Navigation("Creator");
+                });
+
             modelBuilder.Entity("praca_inzynierska_backend.Data.Entities.Report", b =>
                 {
                     b.HasOne("praca_inzynierska_backend.Data.Entities.Artwork", "Artwork")
@@ -516,22 +534,6 @@ namespace backend.Migrations
                     b.Navigation("Artwork");
 
                     b.Navigation("ReportedBy");
-                });
-
-            modelBuilder.Entity("praca_inzynierska_backend.Data.Entities.Review", b =>
-                {
-                    b.HasOne("praca_inzynierska_backend.Data.Entities.Artwork", "Artwork")
-                        .WithMany("Reviews")
-                        .HasForeignKey("ArtworkId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.HasOne("praca_inzynierska_backend.Data.Entities.User", "Creator")
-                        .WithMany("Reviews")
-                        .HasForeignKey("CreatorId");
-
-                    b.Navigation("Artwork");
-
-                    b.Navigation("Creator");
                 });
 
             modelBuilder.Entity("praca_inzynierska_backend.Data.Entities.Vote", b =>
@@ -570,11 +572,11 @@ namespace backend.Migrations
 
             modelBuilder.Entity("praca_inzynierska_backend.Data.Entities.Artwork", b =>
                 {
+                    b.Navigation("Comments");
+
                     b.Navigation("Files");
 
                     b.Navigation("Genres");
-
-                    b.Navigation("Reviews");
 
                     b.Navigation("Tags");
 
@@ -587,7 +589,7 @@ namespace backend.Migrations
 
                     b.Navigation("Avatar");
 
-                    b.Navigation("Reviews");
+                    b.Navigation("Comments");
 
                     b.Navigation("Votes");
                 });

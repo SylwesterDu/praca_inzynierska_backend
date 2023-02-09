@@ -37,9 +37,9 @@ namespace praca_inzynierska_backend.Controllers
         }
 
         [HttpGet("{id}/comments")]
-        public async Task<IActionResult> GetArtworkComments(Guid id)
+        public async Task<IActionResult> GetArtworkReviews(Guid id)
         {
-            List<CommentDTO> dto = await _artworksService.GetArtworkComments(id);
+            List<ReviewDTO> dto = await _artworksService.GetArtworkReviews(id);
             if (dto is null)
             {
                 return NotFound("Artwork with given id does not exists!");
@@ -49,19 +49,16 @@ namespace praca_inzynierska_backend.Controllers
 
         [Authorize]
         [HttpPost("{id}/comment")]
-        public async Task<IActionResult> AddComment(
-            [FromRoute] Guid id,
-            [FromBody] AddCommentDTO dto
-        )
+        public async Task<IActionResult> AddReview([FromRoute] Guid id, [FromBody] AddReviewDTO dto)
         {
             HttpContext.Request.Headers.TryGetValue("Authorization", out StringValues values);
             string token = values[0].Split(' ')[1];
 
             if (dto.content!.Length == 0)
             {
-                return BadRequest("Comment is too short!");
+                return BadRequest("Review is too short!");
             }
-            await _artworksService.AddComment(token, id, dto);
+            await _artworksService.AddReview(token, id, dto);
 
             return Ok();
         }
@@ -90,7 +87,7 @@ namespace praca_inzynierska_backend.Controllers
             HttpContext.Request.Headers.TryGetValue("Authorization", out StringValues values);
             string token = values[0].Split(' ')[1];
 
-            bool success = await _artworksService.UpvoteArtwork(token, id);
+            bool success = await _artworksService.VoteArtwork(token, id, 1);
 
             if (!success)
             {
@@ -107,7 +104,7 @@ namespace praca_inzynierska_backend.Controllers
             HttpContext.Request.Headers.TryGetValue("Authorization", out StringValues values);
             string token = values[0].Split(' ')[1];
 
-            bool success = await _artworksService.DownvoteArtwork(token, id);
+            bool success = await _artworksService.VoteArtwork(token, id, -1);
 
             if (!success)
             {

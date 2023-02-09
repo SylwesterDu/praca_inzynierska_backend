@@ -8,7 +8,7 @@ namespace praca_inzynierska_backend.Data.DTOs
 {
     public class ArtworkDetailsDTO
     {
-        public List<string>? resourceUrls { get; set; }
+        public List<ResourceDTO>? resources { get; set; }
         public Guid Id { get; set; }
         public string? Title { get; set; }
         public string? Description { get; set; }

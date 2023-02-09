@@ -40,8 +40,7 @@ namespace praca_inzynierska_backend.Services.UploadService
                 Id = artworkId,
                 Published = false,
                 Owner = user,
-                Upvotes = new List<Upvote>(),
-                Downvotes = new List<Downvote>(),
+                Votes = new List<Vote>(),
                 Views = 0
             };
             await _artworksRepository.AddArtwork(artwork);
@@ -80,7 +79,7 @@ namespace praca_inzynierska_backend.Services.UploadService
             Artwork artwork = await _artworksRepository.GetArtworkById(id)!;
 
             artwork.ArtType = publishArtworkRequestDTO.ArtType;
-            artwork.Comments = new List<Comment>();
+            artwork.Reviews = new List<Review>();
             artwork.CreatedAt = DateTime.Now;
             artwork.Title = publishArtworkRequestDTO.Title;
             artwork.Description = publishArtworkRequestDTO.Description;

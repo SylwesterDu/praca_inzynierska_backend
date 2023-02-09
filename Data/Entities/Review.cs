@@ -5,13 +5,13 @@ using System.Threading.Tasks;
 
 namespace praca_inzynierska_backend.Data.Entities
 {
-    public class Comment
+    public class Review
     {
         public Guid Id { get; set; }
         public Artwork? Artwork { get; set; }
         public User? Creator { get; set; }
         public string? Content { get; set; }
         public DateTime CreatedAt { get; init; }
-        public int? rating { get; set; }
+        public int? Rating { get; set; }
     }
 }

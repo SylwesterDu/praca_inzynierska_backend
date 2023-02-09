@@ -32,20 +32,20 @@ namespace praca_inzynierska_backend.Services.ArtworksService
             _userManager = userManager;
         }
 
-        public async Task AddComment(string token, Guid id, AddCommentDTO dto)
+        public async Task AddReview(string token, Guid id, AddReviewDTO dto)
         {
             User user = await _accountRepository.GetUserByToken(token);
             Artwork? artwork = await _artworksRepository.GetArtworkById(id)!;
-            Comment comment = new Comment()
+            Review review = new Review()
             {
                 Artwork = artwork,
                 Content = dto.content,
                 CreatedAt = DateTime.Now,
-                rating = dto.rating,
+                Rating = dto.rating,
                 Creator = user
             };
 
-            await _artworksRepository.AddComment(comment);
+            await _artworksRepository.AddReview(review);
         }
 
         public async Task<bool> DeleteArtwork(string token, Guid id)
@@ -76,55 +76,25 @@ namespace praca_inzynierska_backend.Services.ArtworksService
             await _artworksRepository.DeleteReport(report);
         }
 
-        public async Task<bool> DownvoteArtwork(string token, Guid id)
+        public async Task<List<ReviewDTO>> GetArtworkReviews(Guid id)
         {
-            Guid userId = _accountRepository.GetUserIdFromToken(token);
-            User? user = await _accountRepository.GetUserWithUpvotesById(userId);
-            Artwork? artwork = await _artworksRepository.GetArtworkWithUpvotesById(id);
+            IEnumerable<Review> reviews = await _artworksRepository.GetArtworkReviews(id);
 
-            Downvote? downvote = await _artworksRepository.GetDownvote(userId, id);
-
-            if (downvote is not null)
-            {
-                return false;
-            }
-
-            Upvote upvote = await _artworksRepository.GetUpvote(userId, id);
-            if (upvote is not null)
-            {
-                await _artworksRepository.DeleteUpvote(upvote);
-            }
-
-            downvote = new Downvote()
-            {
-                Artwork = artwork,
-                User = user,
-                Id = new Guid()
-            };
-            bool success = await _artworksRepository.DownvoteArtwork(downvote);
-
-            return success;
-        }
-
-        public async Task<List<CommentDTO>> GetArtworkComments(Guid id)
-        {
-            IEnumerable<Comment> comments = await _artworksRepository.GetArtworkComments(id);
-
-            if (comments is null)
+            if (reviews is null)
             {
                 return null!;
             }
 
-            return comments
+            return reviews
                 .Select(
-                    comment =>
-                        new CommentDTO()
+                    review =>
+                        new ReviewDTO()
                         {
-                            Content = comment.Content,
-                            CreatedAt = comment.CreatedAt,
-                            CreatorId = comment.Creator!.Id,
-                            CreatorName = comment.Creator.UserName,
-                            rating = comment.rating
+                            Content = review.Content,
+                            CreatedAt = review.CreatedAt,
+                            CreatorId = review.Creator!.Id,
+                            CreatorName = review.Creator.UserName,
+                            rating = review.Rating
                         }
                 )
                 .ToList();
@@ -165,8 +135,15 @@ namespace praca_inzynierska_backend.Services.ArtworksService
                     Username = artwork.Owner!.UserName,
                     Id = artwork.Owner!.Id
                 },
-                resourceUrls = artwork.Files!
-                    .Select(file => _cloudflareFileService.GetFileUrl(file.Key!))
+                resources = artwork.Files!
+                    .Select(
+                        file =>
+                            new ResourceDTO()
+                            {
+                                Url = _cloudflareFileService.GetFileUrl(file.Key!),
+                                ContentType = file.MimeType
+                            }
+                    )
                     .ToList()!,
                 Tags = artwork.Tags!.Select(tag => tag.TagName)!,
                 Genres = artwork.Genres!.Select(genre => genre.GenreName).ToList()!,
@@ -193,12 +170,16 @@ namespace praca_inzynierska_backend.Services.ArtworksService
                             Tags = artwork.Tags!.Select(tag => tag.TagName).ToList()!,
                             Title = artwork.Title,
                             Views = artwork.Views,
-                            Upvotes = artwork.Upvotes!.Count,
-                            Downvotes = artwork.Downvotes!.Count,
+                            Upvotes = artwork.Votes!.Count(vote => vote.Value == 1),
+                            Downvotes = artwork.Votes!.Count(vote => vote.Value == -1),
                             ThumbnailUrl =
                                 artwork.Files!.Count == 0
                                     ? ""
-                                    : _cloudflareFileService.GetFileUrl(artwork.Files!.First().Key!)
+                                    : artwork.AdultContent
+                                        ? "+18"
+                                        : _cloudflareFileService.GetFileUrl(
+                                            artwork.Files!.First().Key!
+                                        )
                         }
                 )
                 .ToList();
@@ -237,8 +218,8 @@ namespace praca_inzynierska_backend.Services.ArtworksService
                             Tags = artwork.Tags!.Select(tag => tag.TagName).ToList()!,
                             Title = artwork.Title,
                             Views = artwork.Views,
-                            Upvotes = artwork.Upvotes!.Count,
-                            Downvotes = artwork.Downvotes!.Count,
+                            Upvotes = artwork.Votes!.Count(vote => vote.Value == 1),
+                            Downvotes = artwork.Votes!.Count(vote => vote.Value == -1),
                             ThumbnailUrl =
                                 artwork.Files!.Count() > 0
                                     ? _cloudflareFileService.GetFileUrl(artwork.Files!.First().Key!)
@@ -260,15 +241,15 @@ namespace praca_inzynierska_backend.Services.ArtworksService
             List<StatsPerArtworkTypeDTO> artworksViewsByArtType =
                 await _artworksRepository.GetArtworksViewsByArtType(user);
 
-            List<StatsPerArtworkTypeDTO> artworksCommentsCountByArtType =
-                await _artworksRepository.GetArtworksCommentsCountByArtType(user);
+            List<StatsPerArtworkTypeDTO> artworksReviewsCountByArtType =
+                await _artworksRepository.GetArtworksReviewsCountByArtType(user);
 
             VotesCountDTO votesCount = await _artworksRepository.GetArtworksVotes(user);
 
             return new StatsDTO()
             {
                 ArtworksCount = artworksCountByArtType,
-                ArtworksCommentsCount = artworksCommentsCountByArtType,
+                ArtworksReviewsCount = artworksReviewsCountByArtType,
                 ArtworksViewsCount = artworksViewsByArtType,
                 Votes = votesCount
             };
@@ -284,15 +265,15 @@ namespace praca_inzynierska_backend.Services.ArtworksService
             List<StatsPerArtworkTypeDTO> artworksViewsByArtType =
                 await _artworksRepository.GetArtworksViewsByArtType(user);
 
-            List<StatsPerArtworkTypeDTO> artworksCommentsCountByArtType =
-                await _artworksRepository.GetArtworksCommentsCountByArtType(user);
+            List<StatsPerArtworkTypeDTO> artworksReviewsCountByArtType =
+                await _artworksRepository.GetArtworksReviewsCountByArtType(user);
 
             VotesCountDTO votesCount = await _artworksRepository.GetArtworksVotes(user);
 
             return new StatsDTO()
             {
                 ArtworksCount = artworksCountByArtType,
-                ArtworksCommentsCount = artworksCommentsCountByArtType,
+                ArtworksReviewsCount = artworksReviewsCountByArtType,
                 ArtworksViewsCount = artworksViewsByArtType,
                 Votes = votesCount
             };
@@ -360,8 +341,8 @@ namespace praca_inzynierska_backend.Services.ArtworksService
                             Tags = artwork.Tags!.Select(tag => tag.TagName).ToList()!,
                             Title = artwork.Title,
                             Views = artwork.Views,
-                            Upvotes = artwork.Upvotes!.Count,
-                            Downvotes = artwork.Downvotes!.Count,
+                            Upvotes = artwork.Votes!.Count(vote => vote.Value == 1),
+                            Downvotes = artwork.Votes!.Count(vote => vote.Value == -1),
                             ThumbnailUrl =
                                 artwork.Files!.Count() > 0
                                     ? _cloudflareFileService.GetFileUrl(artwork.Files!.First().Key!)
@@ -401,32 +382,29 @@ namespace praca_inzynierska_backend.Services.ArtworksService
             return true;
         }
 
-        public async Task<bool> UpvoteArtwork(string token, Guid id)
+        public async Task<bool> VoteArtwork(string token, Guid id, int value)
         {
             Guid userId = _accountRepository.GetUserIdFromToken(token);
 
             User? user = await _accountRepository.GetUserWithUpvotesById(userId);
             Artwork? artwork = await _artworksRepository.GetArtworkWithUpvotesById(id);
 
-            Upvote? upvote = await _artworksRepository.GetUpvote(userId, id);
-            if (upvote is not null)
+            Vote? vote = await _artworksRepository.GetVote(userId, id);
+            if (vote is not null)
             {
-                return false;
+                vote.Value = value;
+                await _artworksRepository.SaveVote(vote);
+                return true;
             }
 
-            Downvote? downvote = await _artworksRepository.GetDownvote(userId, id);
-            if (downvote is not null)
-            {
-                await _artworksRepository.DeleteDownvote(downvote);
-            }
-
-            upvote = new Upvote()
+            vote = new Vote()
             {
                 Artwork = artwork,
                 User = user,
-                Id = new Guid()
+                Id = new Guid(),
+                Value = value
             };
-            bool success = await _artworksRepository.UpvoteArtwork(upvote);
+            bool success = await _artworksRepository.VoteArtwork(vote);
 
             return success;
         }

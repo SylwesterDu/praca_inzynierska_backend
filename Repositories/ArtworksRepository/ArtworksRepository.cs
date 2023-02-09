@@ -19,7 +19,7 @@ namespace praca_inzynierska_backend.Repositories.ArtworksRepository
             _context = context;
         }
 
-        public async Task<IEnumerable<Comment>> GetArtworkComments(Guid id)
+        public async Task<IEnumerable<Review>> GetArtworkReviews(Guid id)
         {
             Artwork? artwork = await _context.Artworks!.FirstOrDefaultAsync(
                 artwork => artwork.Id == id
@@ -29,9 +29,9 @@ namespace praca_inzynierska_backend.Repositories.ArtworksRepository
             {
                 return null!;
             }
-            return await _context.Comments!
-                .Where(comment => comment.Artwork!.Id == id)
-                .Include(comment => comment.Creator)
+            return await _context.Reviews!
+                .Where(review => review.Artwork!.Id == id)
+                .Include(review => review.Creator)
                 .ToListAsync();
         }
 
@@ -54,17 +54,16 @@ namespace praca_inzynierska_backend.Repositories.ArtworksRepository
                 .Where(artwork => artwork.Owner!.Id == id && artwork.Published)
                 .Include(artwork => artwork.Genres)
                 .Include(artwork => artwork.Tags)
-                .Include(artwork => artwork.Upvotes)
-                .Include(artwork => artwork.Downvotes)
+                .Include(artwork => artwork.Votes)
                 .Include(artwork => artwork.Files)
                 .ToListAsync();
 
             return artworks;
         }
 
-        public async Task AddComment(Comment comment)
+        public async Task AddReview(Review review)
         {
-            await _context.Comments!.AddAsync(comment);
+            await _context.Reviews!.AddAsync(review);
             await _context.SaveChangesAsync();
         }
 
@@ -74,15 +73,9 @@ namespace praca_inzynierska_backend.Repositories.ArtworksRepository
             await _context.SaveChangesAsync();
         }
 
-        public async Task<bool> UpvoteArtwork(Upvote upvote)
+        public async Task<bool> VoteArtwork(Vote vote)
         {
-            Upvote? _upvote = await _context.Upvotes!.FirstOrDefaultAsync(u => u.Equals(upvote));
-            if (_upvote is not null)
-            {
-                return false;
-            }
-
-            await _context.Upvotes!.AddAsync(upvote!);
+            await _context.Votes!.AddAsync(vote);
             await _context.SaveChangesAsync();
             return true;
         }
@@ -91,7 +84,7 @@ namespace praca_inzynierska_backend.Repositories.ArtworksRepository
         {
             Artwork? artwork = await _context.Artworks!
                 .Where(artwork => artwork.Id == id)
-                .Include(artwork => artwork.Upvotes)
+                .Include(artwork => artwork.Votes) //TODO:
                 .FirstOrDefaultAsync();
 
             return artwork!;
@@ -101,7 +94,7 @@ namespace praca_inzynierska_backend.Repositories.ArtworksRepository
         {
             Artwork? artwork = await _context.Artworks!
                 .Where(artwork => artwork.Id == id)
-                .Include(artwork => artwork.Upvotes)
+                .Include(artwork => artwork.Votes) //TODO:
                 .FirstOrDefaultAsync();
 
             return artwork!;
@@ -109,64 +102,32 @@ namespace praca_inzynierska_backend.Repositories.ArtworksRepository
 
         public async Task<int> GetArtworkUpvotesCount(Guid id)
         {
-            int count = await _context.Artworks!
-                .Where(artwork => artwork.Id == id)
-                .Select(artwork => artwork.Upvotes!.Count)
-                .FirstOrDefaultAsync();
+            int count = await _context.Votes!
+                .Where(vote => vote.Artwork!.Id == id && vote.Value == 1)
+                .CountAsync();
 
             return count;
         }
 
         public async Task<int> GetArtworkDownvotesCount(Guid id)
         {
-            int count = await _context.Artworks!
-                .Where(artwork => artwork.Id == id)
-                .Select(artwork => artwork.Downvotes!.Count)
-                .FirstOrDefaultAsync();
+            int count = await _context.Votes!
+                .Where(vote => vote.Artwork!.Id == id && vote.Value == -1)
+                .CountAsync();
 
             return count;
         }
 
-        public async Task<bool> DownvoteArtwork(Downvote downvote)
+        public async Task<Vote> GetVote(Guid userId, Guid artworkId)
         {
-            Downvote? _downvote = await _context.Downvotes!.FirstOrDefaultAsync(
-                d => d.Equals(downvote)
-            );
-            if (_downvote is not null)
-            {
-                return false;
-            }
-
-            await _context.Downvotes!.AddAsync(downvote!);
-            await _context.SaveChangesAsync();
-            return true;
-        }
-
-        public async Task<Upvote> GetUpvote(Guid userId, Guid artworkId)
-        {
-            Upvote? upvote = await _context.Upvotes!.FirstOrDefaultAsync(
-                u => u.Artwork!.Id == artworkId && u.User!.Id == userId
-            );
-            return upvote!;
-        }
-
-        public async Task DeleteUpvote(Upvote upvote)
-        {
-            _context.Upvotes!.Remove(upvote);
-            await _context.SaveChangesAsync();
-        }
-
-        public async Task<Downvote> GetDownvote(Guid userId, Guid artworkId)
-        {
-            Downvote? downvote = await _context.Downvotes!.FirstOrDefaultAsync(
+            Vote? vote = await _context.Votes!.FirstOrDefaultAsync(
                 d => d.Artwork!.Id == artworkId && d.User!.Id == userId
             );
-            return downvote!;
+            return vote!;
         }
 
-        public async Task DeleteDownvote(Downvote downvote)
+        public async Task SaveVote(Vote vote)
         {
-            _context.Downvotes!.Remove(downvote);
             await _context.SaveChangesAsync();
         }
 
@@ -191,8 +152,7 @@ namespace praca_inzynierska_backend.Repositories.ArtworksRepository
             DateTime weekAgo = DateTime.Now.Subtract(TimeSpan.FromDays(7));
             List<Artwork> popularMusic = await _context.Artworks!
                 .Where(artwork => artwork.ArtType == artType && artwork.CreatedAt > weekAgo)
-                .Include(artwork => artwork.Upvotes)
-                .Include(artwork => artwork.Downvotes)
+                .Include(artwork => artwork.Votes)
                 .Include(artwork => artwork.Tags)
                 .Include(artwork => artwork.Genres)
                 .Include(artwork => artwork.Files)
@@ -243,8 +203,7 @@ namespace praca_inzynierska_backend.Repositories.ArtworksRepository
             if (tagsList.Count() == 0)
             {
                 artworks = await _context.Artworks!
-                    .Include(artwork => artwork.Upvotes)
-                    .Include(artwork => artwork.Downvotes)
+                    .Include(artwork => artwork.Votes)
                     .Include(artwork => artwork.Tags)
                     .Include(artwork => artwork.Genres)
                     .Include(artwork => artwork.Files)
@@ -263,8 +222,7 @@ namespace praca_inzynierska_backend.Repositories.ArtworksRepository
             else
             {
                 artworks = await _context.Artworks!
-                    .Include(artwork => artwork.Upvotes)
-                    .Include(artwork => artwork.Downvotes)
+                    .Include(artwork => artwork.Votes)
                     .Include(artwork => artwork.Tags)
                     .Include(artwork => artwork.Genres)
                     .Include(artwork => artwork.Files)
@@ -321,7 +279,7 @@ namespace praca_inzynierska_backend.Repositories.ArtworksRepository
             return stats;
         }
 
-        public async Task<List<StatsPerArtworkTypeDTO>> GetArtworksCommentsCountByArtType(User user)
+        public async Task<List<StatsPerArtworkTypeDTO>> GetArtworksReviewsCountByArtType(User user)
         {
             List<StatsPerArtworkTypeDTO> stats = await _context.Artworks!
                 .Where(artwork => artwork.Owner!.Id == user.Id && artwork.Published)
@@ -331,7 +289,7 @@ namespace praca_inzynierska_backend.Repositories.ArtworksRepository
                         new StatsPerArtworkTypeDTO()
                         {
                             ArtType = result.Key,
-                            Count = result.Sum(artwork => artwork.Comments!.Count())
+                            Count = result.Sum(artwork => artwork.Reviews!.Count())
                         }
                 )
                 .ToListAsync();
@@ -340,13 +298,19 @@ namespace praca_inzynierska_backend.Repositories.ArtworksRepository
 
         public async Task<VotesCountDTO> GetArtworksVotes(User user)
         {
-            int upvotes = await _context.Upvotes!.CountAsync(
-                upvote => upvote.Artwork!.Owner!.Id == user.Id
+            int upvotes = await _context.Votes!.CountAsync(
+                vote => vote.Artwork!.Owner!.Id == user.Id && vote.Value == 1
             );
-            int downvotes = await _context.Downvotes!.CountAsync(
-                upvote => upvote.Artwork!.Owner!.Id == user.Id
+            int downvotes = await _context.Votes!.CountAsync(
+                vote => vote.Artwork!.Owner!.Id == user.Id && vote.Value == -1
             );
             return new VotesCountDTO() { Upvotes = upvotes, Downvotes = downvotes };
+        }
+
+        public async Task DeleteVote(Vote vote)
+        {
+            _context.Remove(vote);
+            await _context.SaveChangesAsync();
         }
     }
 }

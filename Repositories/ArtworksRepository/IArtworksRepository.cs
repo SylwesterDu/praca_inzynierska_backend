@@ -14,17 +14,14 @@ namespace praca_inzynierska_backend.Repositories.ArtworksRepository
         Task<Artwork>? GetArtworkById(Guid id);
         Task<Artwork> GetArtworkWithUpvotesById(Guid id);
         Task<Artwork> GetArtworkWithDownVotesById(Guid id);
-        Task<IEnumerable<Comment>> GetArtworkComments(Guid id);
-        Task AddComment(Comment comment);
+        Task<IEnumerable<Review>> GetArtworkReviews(Guid id);
+        Task AddReview(Review review);
         Task DeleteArtwork(Artwork artwork);
-        Task<bool> UpvoteArtwork(Upvote upvote);
+        Task<bool> VoteArtwork(Vote vote);
         Task<int> GetArtworkUpvotesCount(Guid id);
         Task<int> GetArtworkDownvotesCount(Guid id);
-        Task<bool> DownvoteArtwork(Downvote downvote);
-        Task<Upvote> GetUpvote(Guid userId, Guid artworkId);
-        Task DeleteUpvote(Upvote upvote);
-        Task<Downvote> GetDownvote(Guid userId, Guid artworkId);
-        Task DeleteDownvote(Downvote downvote);
+        Task DeleteVote(Vote vote);
+        Task<Vote> GetVote(Guid userId, Guid artworkId);
         Task AddArtwork(Artwork artwork);
         Task SaveFile(Artwork artwork);
         Task SaveArtwork(Artwork artwork);
@@ -41,7 +38,8 @@ namespace praca_inzynierska_backend.Repositories.ArtworksRepository
         );
         Task<List<StatsPerArtworkTypeDTO>> GetArtworksCountByArtType(User user);
         Task<List<StatsPerArtworkTypeDTO>> GetArtworksViewsByArtType(User user);
-        Task<List<StatsPerArtworkTypeDTO>> GetArtworksCommentsCountByArtType(User user);
+        Task<List<StatsPerArtworkTypeDTO>> GetArtworksReviewsCountByArtType(User user);
         Task<VotesCountDTO> GetArtworksVotes(User user);
+        Task SaveVote(Vote vote);
     }
 }

@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace praca_inzynierska_backend.Data.DTOs
 {
-    public class CommentDTO
+    public class ReviewDTO
     {
         public string? Content { get; set; }
         public DateTime CreatedAt { get; set; }

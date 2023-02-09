@@ -11,11 +11,10 @@ namespace praca_inzynierska_backend.Services.ArtworksService
     {
         public Task<List<ArtworkDTO>> GetUserArtworks(Guid id);
         Task<ArtworkDetailsDTO> GetArtworkDetails(Guid id, string? token);
-        Task<List<CommentDTO>> GetArtworkComments(Guid id);
-        Task AddComment(string token, Guid id, AddCommentDTO dto);
+        Task<List<ReviewDTO>> GetArtworkReviews(Guid id);
+        Task AddReview(string token, Guid id, AddReviewDTO dto);
         Task<bool> DeleteArtwork(string token, Guid id);
-        Task<bool> UpvoteArtwork(string token, Guid id);
-        Task<bool> DownvoteArtwork(string token, Guid id);
+        Task<bool> VoteArtwork(string token, Guid id, int value);
         Task<bool> UpdateArtwork(
             string token,
             Guid id,

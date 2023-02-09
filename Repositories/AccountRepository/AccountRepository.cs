@@ -64,7 +64,7 @@ namespace praca_inzynierska_backend.Repositories.AccountRepository
         {
             User? user = await _context.Users!
                 .Where(user => user.Id == id)
-                .Include(user => user.Upvotes)
+                .Include(user => user.Votes)
                 .FirstOrDefaultAsync();
 
             return user!;

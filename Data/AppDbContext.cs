@@ -21,11 +21,10 @@ namespace praca_inzynierska_backend.Data
 
         public override DbSet<User>? Users { get; set; }
         public DbSet<Artwork>? Artworks { get; set; }
-        public DbSet<Comment>? Comments { get; set; }
+        public DbSet<Review>? Reviews { get; set; }
         public DbSet<Tag>? Tags { get; set; }
         public DbSet<Genre>? Genres { get; set; }
-        public DbSet<Upvote>? Upvotes { get; set; }
-        public DbSet<Downvote>? Downvotes { get; set; }
+        public DbSet<Vote>? Votes { get; set; }
         public DbSet<ArtworkFile>? Files { get; set; }
         public DbSet<Report>? Reports { get; set; }
         public DbSet<AvatarFile>? AvatarFiles { get; set; }
@@ -40,31 +39,20 @@ namespace praca_inzynierska_backend.Data
                 .WithOne(artwork => artwork.Owner);
 
             builder
-                .Entity<Upvote>()
-                .HasOne<User>(upvote => upvote.User)
-                .WithMany(user => user.Upvotes);
-
-            builder
-                .Entity<Upvote>()
-                .HasOne<Artwork>(upvote => upvote.Artwork)
-                .WithMany(artwork => artwork.Upvotes)
+                .Entity<Vote>()
+                .HasOne<Artwork>(vote => vote.Artwork)
+                .WithMany(artwork => artwork.Votes)
                 .OnDelete(DeleteBehavior.Cascade);
 
             builder
-                .Entity<Downvote>()
-                .HasOne<User>(downvote => downvote.User)
-                .WithMany(user => user.Downvotes)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            builder
-                .Entity<Downvote>()
-                .HasOne<Artwork>(downvote => downvote.Artwork)
-                .WithMany(artwork => artwork.Downvotes)
+                .Entity<Vote>()
+                .HasOne<User>(vote => vote.User)
+                .WithMany(user => user.Votes)
                 .OnDelete(DeleteBehavior.Cascade);
 
             builder
                 .Entity<Artwork>()
-                .HasMany<Comment>(artwork => artwork.Comments)
+                .HasMany<Review>(artwork => artwork.Reviews)
                 .WithOne(comment => comment.Artwork)
                 .OnDelete(DeleteBehavior.Cascade);
 

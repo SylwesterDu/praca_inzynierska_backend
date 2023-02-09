@@ -15,9 +15,8 @@ namespace praca_inzynierska_backend.Data.Entities
         public string? Description { get; set; }
         public virtual User? Owner { get; set; }
         public DateTime CreatedAt { get; set; }
-        public virtual List<Comment>? Comments { get; set; }
-        public List<Upvote>? Upvotes { get; set; }
-        public List<Downvote>? Downvotes { get; set; }
+        public virtual List<Review>? Reviews { get; set; }
+        public List<Vote>? Votes { get; set; }
         public long Views { get; set; }
         public ArtType ArtType { get; set; }
         public List<Genre>? Genres { get; set; }

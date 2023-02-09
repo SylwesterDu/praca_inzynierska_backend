@@ -14,10 +14,9 @@ namespace praca_inzynierska_backend.Data.Entities
         }
 
         public List<Artwork>? Artworks { get; set; }
-        public List<Upvote>? Upvotes { get; set; }
+        public List<Vote>? Votes { get; set; }
         public DateTime BirthDate { get; set; }
-        public List<Downvote>? Downvotes { get; set; }
-        public List<Comment>? Comments { get; set; }
+        public List<Review>? Reviews { get; set; }
         public AvatarFile? Avatar { get; set; }
     }
 }

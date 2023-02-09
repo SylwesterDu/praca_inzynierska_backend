@@ -6,30 +6,28 @@ using System.Threading.Tasks;
 
 namespace praca_inzynierska_backend.Data.Entities
 {
-    public class Upvote
+    public class Vote
     {
         public Guid Id { get; set; }
         public User? User { get; set; }
+        public int Value { get; set; }
         public Artwork? Artwork { get; set; }
         public DateTime CreatedAt { get; set; }
 
-        public Upvote()
+        public Vote()
         {
             CreatedAt = DateTime.Now;
         }
 
         public override bool Equals(object? obj)
         {
-
-
             if (obj == null || GetType() != obj.GetType())
             {
                 return false;
             }
 
-            Upvote _upvote = (Upvote)obj;
-            return Artwork!.Id == _upvote.Artwork!.Id
-                && User!.Id == _upvote.User!.Id;
+            Vote _Vote = (Vote)obj;
+            return Artwork!.Id == _Vote.Artwork!.Id && User!.Id == _Vote.User!.Id;
         }
 
         public override int GetHashCode()

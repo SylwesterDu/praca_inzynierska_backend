@@ -9,7 +9,7 @@ namespace praca_inzynierska_backend.Data.DTOs
     {
         public object? ArtworksCount { get; set; }
         public object? ArtworksViewsCount { get; set; }
-        public object? ArtworksCommentsCount { get; set; }
+        public object? ArtworksReviewsCount { get; set; }
         public object? Votes { get; set; }
     }
 }
