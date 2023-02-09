@@ -32,6 +32,7 @@ namespace praca_inzynierska_backend.Repositories.ArtworksRepository
             return await _context.Reviews!
                 .Where(review => review.Artwork!.Id == id)
                 .Include(review => review.Creator)
+                .ThenInclude(creator => creator!.Avatar)
                 .ToListAsync();
         }
 

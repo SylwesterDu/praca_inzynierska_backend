@@ -25,8 +25,15 @@ namespace praca_inzynierska_backend.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetArtworkDetails(Guid id)
         {
-            HttpContext.Request.Headers.TryGetValue("Authorization", out StringValues values);
-            string? token = values[0].Split(' ')[1];
+            bool tokenExists = HttpContext.Request.Headers.TryGetValue(
+                "Authorization",
+                out StringValues values
+            );
+            string? token = null;
+            if (tokenExists)
+            {
+                token = values[0].Split(' ')[1];
+            }
 
             ArtworkDetailsDTO dto = await _artworksService.GetArtworkDetails(id, token);
             if (dto is null)

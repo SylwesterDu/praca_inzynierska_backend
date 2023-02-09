@@ -94,6 +94,9 @@ namespace praca_inzynierska_backend.Services.ArtworksService
                             CreatedAt = review.CreatedAt,
                             CreatorId = review.Creator!.Id,
                             CreatorName = review.Creator.UserName,
+                            CreatorAvatar = _cloudflareFileService.GetFileUrl(
+                                review.Creator.Avatar!.key!
+                            ),
                             rating = review.Rating
                         }
                 )
@@ -102,7 +105,15 @@ namespace praca_inzynierska_backend.Services.ArtworksService
 
         public async Task<ArtworkDetailsDTO> GetArtworkDetails(Guid id, string token)
         {
-            User user = await _accountRepository.GetUserByToken(token);
+            User? user;
+            if (token is null)
+            {
+                user = null;
+            }
+            else
+            {
+                user = await _accountRepository.GetUserByToken(token);
+            }
             Artwork? artwork = await _artworksRepository.GetArtworkById(id)!;
             if (artwork.AdultContent)
             {
